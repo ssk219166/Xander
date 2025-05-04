@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Order Confirmation | Xander</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(to right, #a78bfa, #f472b6);
+      color: white;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      animation: fadeIn 1s ease-in;
+      text-align: center;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    .box {
+      background: white;
+      color: #333;
+      padding: 40px;
+      border-radius: 20px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+    }
+
+    h1 {
+      color: #10b981;
+    }
+
+    p {
+      font-size: 1.1rem;
+      margin-top: 10px;
+    }
+
+    .btns {
+      margin-top: 30px;
+      display: flex;
+      gap: 20px;
+      justify-content: center;
+    }
+
+    .btns a {
+      text-decoration: none;
+      background-color: #6366f1;
+      color: white;
+      padding: 12px 24px;
+      border-radius: 12px;
+      font-weight: bold;
+      transition: background 0.3s;
+    }
+
+    .btns a:hover {
+      background-color: #4f46e5;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="box">
+    <h1>🎉 Order Confirmed!</h1>
+    <p>Thank you for shopping with Xander. Your payment was successful and your order is on its way.</p>
+    <div class="btns">
+      <a href="index.html">🏠 Go Home</a>
+      <a href="profile.html">👤 View Profile</a>
+    </div>
+  </div>
+
+</body>
+</html>

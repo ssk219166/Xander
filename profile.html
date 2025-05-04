@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Your Profile | Xander</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(to bottom right, #f0abfc, #93c5fd);
+      margin: 0;
+      padding: 40px 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      color: #333;
+    }
+
+    .profile-card {
+      background: white;
+      padding: 40px;
+      border-radius: 20px;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+      max-width: 400px;
+      width: 100%;
+      text-align: center;
+    }
+
+    .profile-initial {
+      font-size: 40px;
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #818cf8, #f472b6, #60a5fa);
+      background-size: 200% 200%;
+      animation: shift 5s infinite;
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 20px;
+      font-weight: bold;
+    }
+
+    @keyframes shift {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    input {
+      width: 100%;
+      padding: 12px;
+      border-radius: 10px;
+      border: 1px solid #ccc;
+      margin: 10px 0;
+      font-size: 16px;
+    }
+
+    button {
+      background-color: #4f46e5;
+      color: white;
+      padding: 12px 20px;
+      border: none;
+      border-radius: 10px;
+      font-weight: bold;
+      font-size: 16px;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+
+    button:hover {
+      background-color: #4338ca;
+    }
+
+    .message {
+      margin-top: 15px;
+      color: #10b981;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="profile-card">
+    <div class="profile-initial" id="profileInitial">?</div>
+    <h2>Edit Your Name</h2>
+    <input type="text" id="nameInput" placeholder="Enter your name" />
+    <button onclick="saveName()">💾 Save</button>
+    <div class="message" id="saveMsg"></div>
+  </div>
+
+  <script>
+    const nameInput = document.getElementById("nameInput");
+    const profileInitial = document.getElementById("profileInitial");
+    const saveMsg = document.getElementById("saveMsg");
+
+    // Load name from localStorage
+    const userData = JSON.parse(localStorage.getItem("userData")) || {};
+    if (userData.name) {
+      nameInput.value = userData.name;
+      profileInitial.textContent = userData.name.charAt(0).toUpperCase();
+    }
+
+    function saveName() {
+      const name = nameInput.value.trim();
+      if (!name) {
+        saveMsg.textContent = "Please enter a valid name.";
+        saveMsg.style.color = "red";
+        return;
+      }
+
+      const updatedData = { ...userData, name };
+      localStorage.setItem("userData", JSON.stringify(updatedData));
+      profileInitial.textContent = name.charAt(0).toUpperCase();
+      saveMsg.textContent = "✅ Name updated!";
+      saveMsg.style.color = "#10b981";
+    }
+  </script>
+
+</body>
+</html>

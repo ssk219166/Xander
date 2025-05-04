@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Contact Us | Xander</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(to bottom right, #fbcfe8, #c4b5fd);
+      color: #333;
+    }
+
+    header {
+      background: linear-gradient(to right, #f472b6, #818cf8);
+      color: white;
+      text-align: center;
+      padding: 30px 20px;
+    }
+
+    .contact-section {
+      max-width: 600px;
+      margin: 50px auto;
+      background: white;
+      padding: 30px;
+      border-radius: 20px;
+      box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+    }
+
+    h2 {
+      text-align: center;
+      color: #4f46e5;
+    }
+
+    input, textarea {
+      width: 100%;
+      padding: 12px;
+      margin: 10px 0;
+      border: 1px solid #ddd;
+      border-radius: 10px;
+      font-size: 1rem;
+    }
+
+    button {
+      background-color: #10b981;
+      color: white;
+      border: none;
+      padding: 12px;
+      width: 100%;
+      border-radius: 10px;
+      font-weight: bold;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+
+    button:hover {
+      background-color: #059669;
+    }
+
+    footer {
+      text-align: center;
+      padding: 20px;
+      font-size: 0.9rem;
+      background-color: #f9fafb;
+      color: #555;
+      margin-top: 60px;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>Contact Us - Xander</h1>
+    <p>We'd love to hear from you!</p>
+  </header>
+
+  <section class="contact-section">
+    <h2>📞 Get in Touch</h2>
+    <form onsubmit="sendMessage(); return false;">
+      <input type="text" placeholder="Your Name" required />
+      <input type="email" placeholder="Your Email" required />
+      <textarea rows="5" placeholder="Your Message..." required></textarea>
+      <button type="submit">Send Message</button>
+    </form>
+  </section>
+
+  <footer>
+    &copy; 2025 Xander | Online Shopping. All rights reserved.
+  </footer>
+
+  <script>
+    // 🔒 Redirect if not logged in
+    if (!localStorage.getItem("loggedIn")) {
+      window.location.href = "signin.html";
+    }
+
+    function sendMessage() {
+      alert("Thank you for contacting us! We'll get back to you soon.");
+    }
+  </script>
+</body>
+</html>

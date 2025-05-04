@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Xander Payment Gateway</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(to bottom right, #fef3c7, #ede9fe);
+      margin: 0;
+      padding: 40px 20px;
+    }
+
+    .gateway-container {
+      max-width: 500px;
+      margin: auto;
+      background: #fff;
+      padding: 30px;
+      border-radius: 20px;
+      box-shadow: 0 12px 25px rgba(0,0,0,0.1);
+      text-align: center;
+    }
+
+    h1 {
+      color: #4f46e5;
+      margin-bottom: 10px;
+    }
+
+    p {
+      margin: 10px 0;
+      color: #333;
+    }
+
+    .amount {
+      font-size: 1.5rem;
+      color: #059669;
+      font-weight: bold;
+      margin: 20px 0;
+    }
+
+    .pay-btn {
+      background: #4f46e5;
+      color: white;
+      border: none;
+      padding: 14px 28px;
+      border-radius: 10px;
+      font-size: 1rem;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+
+    .pay-btn:hover {
+      background: #4338ca;
+    }
+
+    .paypal-logo {
+      width: 120px;
+      margin: 20px auto;
+    }
+
+    .loader {
+      display: none;
+      margin-top: 20px;
+    }
+
+    .loader.show {
+      display: block;
+      animation: fadeIn 0.6s ease-in-out;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: scale(0.9); }
+      to { opacity: 1; transform: scale(1); }
+    }
+  </style>
+</head>
+<body>
+  <div class="gateway-container">
+    <img src="https://www.paypalobjects.com/webstatic/icon/pp258.png" alt="PayPal" class="paypal-logo" />
+    <h1>Pay with PayPal</h1>
+    <p>Secure checkout powered by PayPal</p>
+    <div class="amount" id="totalAmount">$0.00</div>
+    <button class="pay-btn" onclick="processPayment()">Pay Now</button>
+    <div class="loader" id="loader"><p>Processing Payment...</p></div>
+  </div>
+
+  <script>
+    // Redirect if not signed in
+    if (!localStorage.getItem("loggedIn")) {
+      window.location.href = "signin.html";
+    }
+
+    const totalDisplay = document.getElementById("totalAmount");
+    const cart = JSON.parse(localStorage.getItem("cartItems")) || [];
+    const loader = document.getElementById("loader");
+
+    // Calculate total
+    const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+    totalDisplay.innerText = `$${total.toFixed(2)}`;
+
+    function processPayment() {
+      loader.classList.add("show");
+
+      // Simulate 2-second PayPal flow
+      setTimeout(() => {
+        const pastOrders = JSON.parse(localStorage.getItem("pastOrders")) || [];
+        const newOrder = {
+          date: new Date().toLocaleString(),
+          items: cart,
+          total: total
+        };
+        pastOrders.push(newOrder);
+        localStorage.setItem("pastOrders", JSON.stringify(pastOrders));
+        localStorage.removeItem("cartItems");
+
+        window.location.href = "payment.html";
+      }, 2000);
+    }
+  </script>
+</body>
+</html>

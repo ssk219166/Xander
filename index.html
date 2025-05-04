@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Xander | Online Shopping</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(to bottom right, #fbcfe8, #c4b5fd, #818cf8);
+      color: #333;
+      animation: fadeIn 1s ease-in;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    header {
+      text-align: center;
+      padding: 30px 20px;
+      background: linear-gradient(to right, #f472b6, #818cf8);
+      color: white;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    }
+
+    nav {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 20px;
+      background-color: #fff;
+      padding: 15px 0;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+    }
+
+    nav a, nav button {
+      text-decoration: none;
+      color: #4f46e5;
+      font-weight: bold;
+      padding: 8px 16px;
+      border-radius: 10px;
+      transition: background 0.3s;
+      background: none;
+      border: none;
+      cursor: pointer;
+    }
+
+    nav a:hover, nav button:hover {
+      background-color: #e0e7ff;
+    }
+
+    .section {
+      padding: 50px 20px;
+      max-width: 1200px;
+      margin: auto;
+      animation: fadeIn 1s ease;
+    }
+
+    .products {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 20px;
+    }
+
+    .card {
+      background-color: white;
+      padding: 20px;
+      border-radius: 20px;
+      box-shadow: 0 10px 15px rgba(0,0,0,0.1);
+      text-align: center;
+      transition: transform 0.3s ease;
+      opacity: 0;
+      transform: translateY(30px);
+      animation: slideUp 0.6s ease forwards;
+    }
+
+    @keyframes slideUp {
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .card:hover {
+      transform: translateY(-5px);
+    }
+
+    .add-btn {
+      margin-top: 15px;
+      background-color: #6366f1;
+      color: white;
+      padding: 10px;
+      border: none;
+      border-radius: 10px;
+      font-weight: bold;
+      cursor: pointer;
+      width: 100%;
+      transition: transform 0.2s;
+    }
+
+    .add-btn:hover {
+      background-color: #4f46e5;
+      transform: scale(1.05);
+    }
+
+    .contact-form, .profile-box {
+      background-color: white;
+      padding: 30px;
+      border-radius: 20px;
+      box-shadow: 0 10px 15px rgba(0,0,0,0.1);
+    }
+
+    input, textarea {
+      width: 100%;
+      padding: 10px;
+      margin: 10px 0;
+      border: 1px solid #ddd;
+      border-radius: 10px;
+    }
+
+    .submit-btn {
+      background-color: #10b981;
+      color: white;
+      border: none;
+      padding: 12px;
+      width: 100%;
+      border-radius: 10px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+
+    .submit-btn:hover {
+      background-color: #059669;
+    }
+
+    footer {
+      text-align: center;
+      padding: 20px;
+      font-size: 0.85rem;
+      background-color: #f9fafb;
+      color: #555;
+    }
+
+    .cart-box {
+      position: fixed;
+      top: 20px;
+      left: 20px;
+      background: white;
+      padding: 10px 20px;
+      border-radius: 999px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+      font-weight: bold;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .bump {
+      animation: bump 0.3s ease;
+    }
+
+    @keyframes bump {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.2); }
+      100% { transform: scale(1); }
+    }
+
+    .profile-wrapper {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      z-index: 1000;
+    }
+
+    .profile-badge {
+      background: linear-gradient(135deg, #f472b6, #c084fc, #60a5fa);
+      background-size: 300% 300%;
+      animation: gradientShift 6s ease infinite;
+      color: white;
+      font-weight: bold;
+      font-size: 20px;
+      width: 55px;
+      height: 55px;
+      border-radius: 50%;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      text-decoration: none;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+      transition: transform 0.3s ease;
+    }
+
+    .profile-badge:hover {
+      transform: scale(1.1);
+    }
+
+    .profile-name {
+      color: white;
+      font-weight: bold;
+      background-color: #4f46e5;
+      padding: 8px 14px;
+      border-radius: 20px;
+      font-size: 14px;
+      white-space: nowrap;
+      box-shadow: 0 5px 10px rgba(0,0,0,0.1);
+    }
+
+    @keyframes gradientShift {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>Xander | Online Shopping</h1>
+    <p>Find your style in every season</p>
+  </header>
+
+  <nav>
+    <a href="#shop">🛍️ Shop</a>
+    <a href="#contact">📞 Contact</a>
+    <a href="signup.html" target="_blank">Sign Up</a>
+    <button id="logoutBtn">🚪 Logout</button>
+  </nav>
+
+  <div class="profile-wrapper">
+    <a href="profile.html" class="profile-badge" id="profileIcon" title="Your Profile" target="_blank"></a>
+    <span class="profile-name" id="profileName"></span>
+  </div>
+
+  <div class="cart-box" id="cart-box">
+    🛒 Cart: <span id="cart-count">0</span>
+  </div>
+
+  <section class="section" id="shop">
+    <h2>🛍️ Shop Now</h2>
+    <div class="products">
+      <div class="card"><h3>Summer Tee</h3><p>Light, colorful, comfy.</p><button class="add-btn" onclick="addToCart('Summer Tee', 15)">Add to Cart</button></div>
+      <div class="card"><h3>Winter Hoodie</h3><p>Cozy styles for cold days.</p><button class="add-btn" onclick="addToCart('Winter Hoodie', 25)">Add to Cart</button></div>
+      <div class="card"><h3>Casual Shirt</h3><p>Style meets comfort.</p><button class="add-btn" onclick="addToCart('Casual Shirt', 20)">Add to Cart</button></div>
+      <div class="card"><h3>Exclusive Deal Tee</h3><p>Special limited-time offer!</p><button class="add-btn" onclick="addToCart('Exclusive Deal Tee', 10)">Add to Cart</button></div>
+    </div>
+  </section>
+
+  <section class="section" id="contact">
+    <h2>📞 Contact Us</h2>
+    <div class="contact-form">
+      <input type="text" placeholder="Your Name" required>
+      <input type="email" placeholder="Your Email" required>
+      <textarea rows="5" placeholder="Your Message"></textarea>
+      <button class="submit-btn" onclick="alert('Message sent!')">Send Message</button>
+    </div>
+  </section>
+
+  <footer>
+    © 2025 Xander | Online Shopping. All rights reserved.
+  </footer>
+
+  <script>
+    const isLoggedIn = localStorage.getItem("loggedIn");
+    if (!isLoggedIn) window.location.href = "signin.html";
+
+    let cart = JSON.parse(localStorage.getItem("cart")) || [];
+
+    function addToCart(name, price) {
+      cart.push({ name, price });
+      localStorage.setItem("cart", JSON.stringify(cart));
+      const cartCount = document.getElementById("cart-count");
+      const cartBox = document.getElementById("cart-box");
+      cartCount.innerText = cart.length;
+      cartBox.classList.remove("bump");
+      void cartBox.offsetWidth;
+      cartBox.classList.add("bump");
+    }
+
+    document.getElementById("logoutBtn").addEventListener("click", () => {
+      localStorage.removeItem("loggedIn");
+      window.location.href = "signin.html";
+    });
+
+    const userData = JSON.parse(localStorage.getItem("userData"));
+    const profileIcon = document.getElementById("profileIcon");
+    const profileName = document.getElementById("profileName");
+
+    if (userData && userData.name) {
+      const name = userData.name.trim();
+      profileIcon.textContent = name.charAt(0).toUpperCase();
+      profileName.textContent = name;
+    }
+
+    document.getElementById("cart-count").innerText = cart.length;
+  </script>
+</body>
+</html>
