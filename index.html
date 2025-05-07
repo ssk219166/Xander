@@ -106,7 +106,7 @@
       transform: scale(1.05);
     }
 
-    .contact-form, .profile-box {
+    .contact-form {
       background-color: white;
       padding: 30px;
       border-radius: 20px;
@@ -157,6 +157,7 @@
       display: flex;
       align-items: center;
       gap: 10px;
+      z-index: 1000;
     }
 
     .bump {
@@ -169,17 +170,10 @@
       100% { transform: scale(1); }
     }
 
-    .profile-wrapper {
+    .profile-badge {
       position: fixed;
       top: 20px;
       right: 20px;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      z-index: 1000;
-    }
-
-    .profile-badge {
       background: linear-gradient(135deg, #f472b6, #c084fc, #60a5fa);
       background-size: 300% 300%;
       animation: gradientShift 6s ease infinite;
@@ -195,21 +189,11 @@
       text-decoration: none;
       box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
       transition: transform 0.3s ease;
+      z-index: 1000;
     }
 
     .profile-badge:hover {
       transform: scale(1.1);
-    }
-
-    .profile-name {
-      color: white;
-      font-weight: bold;
-      background-color: #4f46e5;
-      padding: 8px 14px;
-      border-radius: 20px;
-      font-size: 14px;
-      white-space: nowrap;
-      box-shadow: 0 5px 10px rgba(0,0,0,0.1);
     }
 
     @keyframes gradientShift {
@@ -227,22 +211,21 @@
   </header>
 
   <nav>
-    <a href="shop.html">🛍️ Shop</a>
-    <a href="contact.html">📞 Contact</a>
-    <a href="checkout.html">Checkout</a>
+    <a href="#shop">🛍️ Shop</a>
+    <a href="#contact">📞 Contact</a>
     <a href="signup.html" target="_blank">Sign Up</a>
     <button id="logoutBtn">🚪 Logout</button>
   </nav>
 
-  <div class="profile-wrapper">
-    <a href="profile.html" class="profile-badge" id="profileIcon" title="Your Profile" target="_blank"></a>
-    <span class="profile-name" id="profileName"></span>
-  </div>
+  <!-- Profile Icon -->
+  <a href="profile.html" class="profile-badge" id="profileIcon" title="Your Profile" target="_blank"></a>
 
+  <!-- Cart Box -->
   <div class="cart-box" id="cart-box">
     🛒 Cart: <span id="cart-count">0</span>
   </div>
 
+  <!-- Shop Section -->
   <section class="section" id="shop">
     <h2>🛍️ Shop Now</h2>
     <div class="products">
@@ -253,6 +236,7 @@
     </div>
   </section>
 
+  <!-- Contact Section -->
   <section class="section" id="contact">
     <h2>📞 Contact Us</h2>
     <div class="contact-form">
@@ -268,9 +252,11 @@
   </footer>
 
   <script>
+    // Redirect if not logged in
     const isLoggedIn = localStorage.getItem("loggedIn");
     if (!isLoggedIn) window.location.href = "signin.html";
 
+    // Cart
     let cart = JSON.parse(localStorage.getItem("cart")) || [];
 
     function addToCart(name, price) {
@@ -289,17 +275,17 @@
       window.location.href = "signin.html";
     });
 
-    const userData = JSON.parse(localStorage.getItem("userData"));
+    // Profile Initials
     const profileIcon = document.getElementById("profileIcon");
-    const profileName = document.getElementById("profileName");
-
+    const userData = JSON.parse(localStorage.getItem("userData"));
     if (userData && userData.name) {
       const name = userData.name.trim();
-      profileIcon.textContent = name.charAt(0).toUpperCase();
-      profileName.textContent = name;
+      const initials = name.split(" ").map(n => n[0]).join("").toUpperCase().slice(0, 2);
+      profileIcon.textContent = initials;
     }
 
     document.getElementById("cart-count").innerText = cart.length;
   </script>
+
 </body>
 </html>
