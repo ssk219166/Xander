@@ -3,121 +3,107 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Xander Payment Gateway</title>
+  <title>Welcome | Xander Online Shopping</title>
   <style>
-    body {
-      font-family: 'Segoe UI', sans-serif;
-      background: linear-gradient(to bottom right, #fef3c7, #ede9fe);
+    * {
+      box-sizing: border-box;
       margin: 0;
-      padding: 40px 20px;
+      padding: 0;
     }
 
-    .gateway-container {
-      max-width: 500px;
-      margin: auto;
-      background: #fff;
-      padding: 30px;
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(to bottom right, #c4b5fd, #818cf8);
+      color: #fff;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      animation: fadeIn 1.2s ease;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    .container {
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(12px);
+      padding: 50px 40px;
       border-radius: 20px;
-      box-shadow: 0 12px 25px rgba(0,0,0,0.1);
+      box-shadow: 0 10px 30px rgba(0,0,0,0.2);
       text-align: center;
+      max-width: 420px;
+      width: 90%;
     }
 
     h1 {
-      color: #4f46e5;
+      font-size: 2.2rem;
       margin-bottom: 10px;
     }
 
     p {
-      margin: 10px 0;
-      color: #333;
+      font-size: 1.05rem;
+      margin-bottom: 30px;
+      color: #e0e7ff;
     }
 
-    .amount {
-      font-size: 1.5rem;
-      color: #059669;
-      font-weight: bold;
-      margin: 20px 0;
+    .btn-group {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
     }
 
-    .pay-btn {
-      background: #4f46e5;
-      color: white;
+    .btn {
+      padding: 14px;
       border: none;
-      padding: 14px 28px;
       border-radius: 10px;
       font-size: 1rem;
       font-weight: bold;
       cursor: pointer;
-      transition: background 0.3s;
+      transition: transform 0.2s, background 0.3s;
+      color: white;
     }
 
-    .pay-btn:hover {
-      background: #4338ca;
+    .btn-signin {
+      background: #6366f1;
     }
 
-    .paypal-logo {
-      width: 120px;
-      margin: 20px auto;
+    .btn-signup {
+      background: #f472b6;
     }
 
-    .loader {
-      display: none;
-      margin-top: 20px;
+    .btn-explore {
+      background: #10b981;
     }
 
-    .loader.show {
-      display: block;
-      animation: fadeIn 0.6s ease-in-out;
+    .btn:hover {
+      transform: scale(1.05);
+      opacity: 0.9;
     }
 
-    @keyframes fadeIn {
-      from { opacity: 0; transform: scale(0.9); }
-      to { opacity: 1; transform: scale(1); }
+    footer {
+      margin-top: 25px;
+      font-size: 0.85rem;
+      color: #d1d5db;
     }
   </style>
 </head>
 <body>
-  <div class="gateway-container">
-    <img src="https://www.paypalobjects.com/webstatic/icon/pp258.png" alt="PayPal" class="paypal-logo" />
-    <h1>Pay with PayPal</h1>
-    <p>Secure checkout powered by PayPal</p>
-    <div class="amount" id="totalAmount">$0.00</div>
-    <button class="pay-btn" onclick="processPayment()">Pay Now</button>
-    <div class="loader" id="loader"><p>Processing Payment...</p></div>
+  <div class="container">
+    <h1>Welcome to Xander</h1>
+    <p>Your one-stop shop for fashion, deals & trends.</p>
+
+    <div class="btn-group">
+      <button class="btn btn-signin" onclick="location.href='signin.html'">Sign In</button>
+      <button class="btn btn-signup" onclick="location.href='signup.html'">Sign Up</button>
+      <button class="btn btn-explore" onclick="location.href='index.html'">Explore as Guest</button>
+    </div>
+
+    <footer>
+      &copy; 2025 Xander Online Shopping. All rights reserved.
+    </footer>
   </div>
-
-  <script>
-    // Redirect if not signed in
-    if (!localStorage.getItem("loggedIn")) {
-      window.location.href = "signin.html";
-    }
-
-    const totalDisplay = document.getElementById("totalAmount");
-    const cart = JSON.parse(localStorage.getItem("cartItems")) || [];
-    const loader = document.getElementById("loader");
-
-    // Calculate total
-    const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-    totalDisplay.innerText = `$${total.toFixed(2)}`;
-
-    function processPayment() {
-      loader.classList.add("show");
-
-      // Simulate 2-second PayPal flow
-      setTimeout(() => {
-        const pastOrders = JSON.parse(localStorage.getItem("pastOrders")) || [];
-        const newOrder = {
-          date: new Date().toLocaleString(),
-          items: cart,
-          total: total
-        };
-        pastOrders.push(newOrder);
-        localStorage.setItem("pastOrders", JSON.stringify(pastOrders));
-        localStorage.removeItem("cartItems");
-
-        window.location.href = "payment.html";
-      }, 2000);
-    }
-  </script>
 </body>
 </html>
