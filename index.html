@@ -157,7 +157,6 @@
       display: flex;
       align-items: center;
       gap: 10px;
-      z-index: 1000;
     }
 
     .bump {
@@ -201,6 +200,12 @@
       50% { background-position: 100% 50%; }
       100% { background-position: 0% 50%; }
     }
+
+    #greeting {
+      text-align: center;
+      font-size: 1.4rem;
+      margin-top: 10px;
+    }
   </style>
 </head>
 <body>
@@ -208,6 +213,7 @@
   <header>
     <h1>Xander | Online Shopping</h1>
     <p>Find your style in every season</p>
+    <h2 id="greeting"></h2>
   </header>
 
   <nav>
@@ -225,7 +231,12 @@
 
   <section class="section" id="shop">
     <h2>🛍️ Shop Now</h2>
-    <div class="products" id="productContainer"></div>
+    <div class="products">
+      <div class="card"><h3>Summer Tee</h3><p>Light, colorful, comfy.</p><button class="add-btn" onclick="addToCart('Summer Tee', 15)">Add to Cart</button></div>
+      <div class="card"><h3>Winter Hoodie</h3><p>Cozy styles for cold days.</p><button class="add-btn" onclick="addToCart('Winter Hoodie', 25)">Add to Cart</button></div>
+      <div class="card"><h3>Casual Shirt</h3><p>Style meets comfort.</p><button class="add-btn" onclick="addToCart('Casual Shirt', 20)">Add to Cart</button></div>
+      <div class="card"><h3>Exclusive Deal Tee</h3><p>Special limited-time offer!</p><button class="add-btn" onclick="addToCart('Exclusive Deal Tee', 10)">Add to Cart</button></div>
+    </div>
   </section>
 
   <section class="section" id="contact">
@@ -246,13 +257,14 @@
     const isLoggedIn = localStorage.getItem("loggedIn");
     if (!isLoggedIn) window.location.href = "signin.html";
 
-    const cart = JSON.parse(localStorage.getItem("cart")) || [];
+    let cart = JSON.parse(localStorage.getItem("cart")) || [];
 
     function addToCart(name, price) {
       cart.push({ name, price });
       localStorage.setItem("cart", JSON.stringify(cart));
-      document.getElementById("cart-count").innerText = cart.length;
+      const cartCount = document.getElementById("cart-count");
       const cartBox = document.getElementById("cart-box");
+      cartCount.innerText = cart.length;
       cartBox.classList.remove("bump");
       void cartBox.offsetWidth;
       cartBox.classList.add("bump");
@@ -266,26 +278,15 @@
     const profileIcon = document.getElementById("profileIcon");
     const userData = JSON.parse(localStorage.getItem("userData"));
     if (userData && userData.name) {
-      const initials = userData.name.trim().split(" ").map(n => n[0]).join('').toUpperCase().slice(0, 2);
+      const name = userData.name.trim();
+      const initials = name.split(" ").map(n => n[0]).join("").toUpperCase().slice(0, 2);
       profileIcon.textContent = initials;
+
+      const greeting = document.getElementById("greeting");
+      greeting.textContent = `Welcome, ${name}!`;
     }
 
     document.getElementById("cart-count").innerText = cart.length;
-
-    const products = [
-      { name: "Summer Tee", desc: "Light, colorful, comfy.", price: 15 },
-      { name: "Winter Hoodie", desc: "Cozy styles for cold days.", price: 25 },
-      { name: "Casual Shirt", desc: "Style meets comfort.", price: 20 },
-      { name: "Exclusive Deal Tee", desc: "Special limited-time offer!", price: 10 }
-    ];
-
-    const productContainer = document.getElementById("productContainer");
-    products.forEach(prod => {
-      const card = document.createElement("div");
-      card.className = "card";
-      card.innerHTML = `<h3>${prod.name}</h3><p>${prod.desc}</p><button class='add-btn' onclick="addToCart('${prod.name}', ${prod.price})">Add to Cart</button>`;
-      productContainer.appendChild(card);
-    });
   </script>
 </body>
 </html>
