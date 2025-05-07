@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Your Orders | Xander</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(to right, #e0e7ff, #f0abfc);
+      color: #333;
+    }
+
+    header {
+      background: linear-gradient(to right, #818cf8, #f472b6);
+      color: white;
+      padding: 30px 20px;
+      text-align: center;
+      box-shadow: 0 5px 10px rgba(0,0,0,0.1);
+    }
+
+    h1 {
+      margin: 0;
+    }
+
+    .orders-container {
+      max-width: 1000px;
+      margin: 40px auto;
+      padding: 20px;
+      background: white;
+      border-radius: 20px;
+      box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+    }
+
+    .order {
+      border: 2px dashed #ddd;
+      border-radius: 15px;
+      padding: 20px;
+      margin-bottom: 20px;
+      animation: fadeIn 0.5s ease;
+    }
+
+    .order h3 {
+      margin: 0 0 10px;
+      color: #4f46e5;
+    }
+
+    .order-item {
+      padding: 8px 0;
+      border-bottom: 1px solid #eee;
+    }
+
+    .order-item:last-child {
+      border-bottom: none;
+    }
+
+    .no-orders {
+      text-align: center;
+      color: #888;
+      padding: 50px;
+      font-size: 1.2rem;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    footer {
+      text-align: center;
+      padding: 20px;
+      font-size: 0.85rem;
+      color: #666;
+    }
+
+    .back-btn {
+      display: inline-block;
+      margin-bottom: 20px;
+      padding: 10px 20px;
+      background: #6366f1;
+      color: white;
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+      font-weight: bold;
+      text-decoration: none;
+      transition: background 0.3s;
+    }
+
+    .back-btn:hover {
+      background: #4f46e5;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>📦 Your Orders</h1>
+    <p>See your order history below</p>
+  </header>
+
+  <div class="orders-container">
+    <a href="profile.html" class="back-btn">← Back to Profile</a>
+    <div id="orders-list"></div>
+  </div>
+
+  <footer>
+    © 2025 Xander | Online Shopping. All rights reserved.
+  </footer>
+
+  <script>
+    const ordersList = document.getElementById("orders-list");
+    const pastOrders = JSON.parse(localStorage.getItem("pastOrders")) || [];
+
+    if (pastOrders.length === 0) {
+      ordersList.innerHTML = `<div class="no-orders">You haven’t placed any orders yet.</div>`;
+    } else {
+      pastOrders.forEach((order, index) => {
+        const orderDiv = document.createElement("div");
+        orderDiv.className = "order";
+        orderDiv.innerHTML = `
+          <h3>🧾 Order #${index + 1}</h3>
+          <p><strong>Date:</strong> ${order.date}</p>
+          <p><strong>Total:</strong> $${order.total}</p>
+          <div>
+            ${order.items.map(item => `
+              <div class="order-item">• ${item.name} - $${item.price}</div>
+            `).join("")}
+          </div>
+        `;
+        ordersList.appendChild(orderDiv);
+      });
+    }
+  </script>
+</body>
+</html>
