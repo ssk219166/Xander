@@ -3,60 +3,85 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Sign In - Xander</title>
+  <title>Sign In | Xander</title>
   <style>
     body {
+      margin: 0;
       font-family: 'Segoe UI', sans-serif;
-      background: #f0f4ff;
+      background: linear-gradient(to right, #c084fc, #60a5fa);
       display: flex;
       justify-content: center;
       align-items: center;
       height: 100vh;
+      animation: fadeIn 1s ease-in;
     }
-    .signin-box {
-      background: white;
-      padding: 30px;
-      border-radius: 12px;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-      width: 300px;
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
     }
+
+    .signin-container {
+      background-color: white;
+      padding: 40px;
+      border-radius: 20px;
+      box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+      max-width: 400px;
+      width: 100%;
+    }
+
+    h2 {
+      margin-bottom: 20px;
+      color: #4f46e5;
+      text-align: center;
+    }
+
     input {
       width: 100%;
-      padding: 10px;
+      padding: 12px;
       margin: 10px 0;
-      border-radius: 8px;
-      border: 1px solid #ccc;
+      border: 1px solid #ddd;
+      border-radius: 10px;
     }
+
     button {
       width: 100%;
       padding: 12px;
-      background: #4f46e5;
+      background-color: #4f46e5;
       color: white;
-      border: none;
-      border-radius: 8px;
-      cursor: pointer;
       font-weight: bold;
+      border: none;
+      border-radius: 10px;
+      margin-top: 15px;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+
+    button:hover {
+      background-color: #4338ca;
     }
   </style>
 </head>
 <body>
-  <div class="signin-box">
-    <h2>Sign In</h2>
-    <input type="text" id="username" placeholder="Enter your name" required />
-    <button onclick="signIn()">Login</button>
+
+  <div class="signin-container">
+    <h2>Sign In to Xander</h2>
+    <input type="text" id="nameInput" placeholder="Enter your full name" required />
+    <button onclick="signIn()">Sign In</button>
   </div>
 
   <script>
     function signIn() {
-      const name = document.getElementById('username').value.trim();
-      if (name) {
-        const userData = { name };
-        localStorage.setItem('userData', JSON.stringify(userData));
-        localStorage.setItem('loggedIn', 'true');
-        window.location.href = 'index.html';
-      } else {
-        alert('Please enter your name.');
+      const name = document.getElementById('nameInput').value.trim();
+      if (!name) {
+        alert("Please enter your name.");
+        return;
       }
+
+      const userData = { name };
+      localStorage.setItem("userData", JSON.stringify(userData));
+      localStorage.setItem("loggedIn", true);
+      window.location.href = "index.html";
     }
   </script>
 </body>
