@@ -5,8 +5,13 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Xander | Online Shopping</title>
   <style>
-    body {
+    * {
       margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
       font-family: 'Segoe UI', sans-serif;
       background: linear-gradient(to bottom right, #fbcfe8, #c4b5fd, #818cf8);
       color: #333;
@@ -157,6 +162,7 @@
       display: flex;
       align-items: center;
       gap: 10px;
+      z-index: 1000;
     }
 
     .bump {
@@ -200,12 +206,6 @@
       50% { background-position: 100% 50%; }
       100% { background-position: 0% 50%; }
     }
-
-    #greeting {
-      text-align: center;
-      font-size: 1.4rem;
-      margin-top: 10px;
-    }
   </style>
 </head>
 <body>
@@ -213,20 +213,18 @@
   <header>
     <h1>Xander | Online Shopping</h1>
     <p>Find your style in every season</p>
-    <h2 id="greeting"></h2>
   </header>
 
   <nav>
-    <a href="shop.html">🛍️ Shop</a>
-    <a href="contact.html">📞 Contact</a>
-    <a href="signup.html" target="_blank">Sign Up</a>
-    <a href="paymentgateway.html" target="_blank">GateWay</a>
+    <a href="#shop">🛍️ Shop</a>
+    <a href="#contact">📞 Contact</a>
+    <a href="signup.html">Sign Up</a>
     <button id="logoutBtn">🚪 Logout</button>
   </nav>
 
   <a href="profile.html" class="profile-badge" id="profileIcon" title="Your Profile" target="_blank"></a>
 
-  <div class="cart-box" id="cart-box">
+  <div class="cart-box">
     🛒 Cart: <span id="cart-count">0</span>
   </div>
 
@@ -255,39 +253,38 @@
   </footer>
 
   <script>
-    const isLoggedIn = localStorage.getItem("loggedIn");
-    if (!isLoggedIn) window.location.href = "signin.html";
+    // Redirect to signin if not logged in
+    if (!localStorage.getItem("loggedIn")) {
+      window.location.href = "signin.html";
+    }
 
-    let cart = JSON.parse(localStorage.getItem("cart")) || [];
+    // Cart handling
+    let cart = JSON.parse(localStorage.getItem("cart") || "[]");
+    document.getElementById("cart-count").innerText = cart.length;
 
     function addToCart(name, price) {
       cart.push({ name, price });
       localStorage.setItem("cart", JSON.stringify(cart));
-      const cartCount = document.getElementById("cart-count");
-      const cartBox = document.getElementById("cart-box");
-      cartCount.innerText = cart.length;
-      cartBox.classList.remove("bump");
-      void cartBox.offsetWidth;
-      cartBox.classList.add("bump");
+      const count = document.getElementById("cart-count");
+      count.innerText = cart.length;
+      count.parentElement.classList.remove("bump");
+      void count.offsetWidth;
+      count.parentElement.classList.add("bump");
     }
 
-    document.getElementById("logoutBtn").addEventListener("click", () => {
+    // Profile badge initials
+    const userData = JSON.parse(localStorage.getItem("userData") || "{}");
+    const profileIcon = document.getElementById("profileIcon");
+    if (userData && userData.name) {
+      const initials = userData.name.trim().split(" ").map(n => n[0]).join("").toUpperCase().slice(0, 2);
+      profileIcon.textContent = initials;
+    }
+
+    // Logout
+    document.getElementById("logoutBtn").onclick = () => {
       localStorage.removeItem("loggedIn");
       window.location.href = "signin.html";
-    });
-
-    const profileIcon = document.getElementById("profileIcon");
-    const userData = JSON.parse(localStorage.getItem("userData"));
-    if (userData && userData.name) {
-      const name = userData.name.trim();
-      const initials = name.split(" ").map(n => n[0]).join("").toUpperCase().slice(0, 2);
-      profileIcon.textContent = initials;
-
-      const greeting = document.getElementById("greeting");
-      greeting.textContent = `Welcome, ${name}!`;
-    }
-
-    document.getElementById("cart-count").innerText = cart.length;
+    };
   </script>
 </body>
 </html>
