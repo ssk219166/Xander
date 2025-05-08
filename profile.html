@@ -3,61 +3,112 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Your Profile</title>
+  <title>Profile | Xander</title>
   <style>
     body {
       font-family: 'Segoe UI', sans-serif;
-      background: #eef2ff;
-      padding: 50px;
+      margin: 0;
+      background: linear-gradient(to bottom right, #fef3c7, #fbcfe8, #c4b5fd);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 50px 20px;
+      animation: fadeIn 1s ease-in;
     }
-    .profile-box {
-      background: white;
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    .profile-container {
+      background-color: white;
       padding: 30px;
+      border-radius: 20px;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.1);
       max-width: 500px;
-      margin: auto;
-      border-radius: 12px;
-      box-shadow: 0 6px 20px rgba(0,0,0,0.1);
-    }
-    input {
       width: 100%;
-      padding: 10px;
-      margin: 10px 0;
-      border-radius: 8px;
-      border: 1px solid #ccc;
     }
+
+    h2 {
+      text-align: center;
+      color: #4f46e5;
+      margin-bottom: 20px;
+    }
+
+    .profile-detail {
+      margin: 15px 0;
+      font-size: 1.1rem;
+    }
+
+    .orders-list {
+      margin-top: 30px;
+    }
+
+    .order-item {
+      background: #f3f4f6;
+      padding: 10px 15px;
+      border-radius: 10px;
+      margin: 5px 0;
+    }
+
     button {
-      padding: 10px 20px;
-      background: #6366f1;
+      margin-top: 20px;
+      padding: 12px;
+      background-color: #ef4444;
       color: white;
-      border: none;
-      border-radius: 8px;
-      cursor: pointer;
       font-weight: bold;
+      border: none;
+      border-radius: 10px;
+      width: 100%;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+
+    button:hover {
+      background-color: #dc2626;
     }
   </style>
 </head>
 <body>
-  <div class="profile-box">
+
+  <div class="profile-container">
     <h2>Your Profile</h2>
-    <label for="name">Update Name:</label>
-    <input type="text" id="name" placeholder="Enter new name" />
-    <button onclick="updateName()">Save Changes</button>
+    <div class="profile-detail" id="profileName">Name: </div>
+
+    <div class="orders-list">
+      <h3>Past Orders</h3>
+      <div id="ordersContainer"></div>
+    </div>
+
+    <button onclick="logout()">Logout</button>
   </div>
 
   <script>
     const userData = JSON.parse(localStorage.getItem("userData"));
-    if (userData && userData.name) {
-      document.getElementById("name").value = userData.name;
+    const orders = JSON.parse(localStorage.getItem("pastOrders")) || [];
+
+    if (!userData || !localStorage.getItem("loggedIn")) {
+      window.location.href = "signin.html";
+    } else {
+      document.getElementById("profileName").textContent = `Name: ${userData.name}`;
     }
 
-    function updateName() {
-      const newName = document.getElementById("name").value.trim();
-      if (newName) {
-        userData.name = newName;
-        localStorage.setItem("userData", JSON.stringify(userData));
-        alert("Name updated!");
-        window.location.href = "index.html";
-      }
+    const ordersContainer = document.getElementById("ordersContainer");
+    if (orders.length === 0) {
+      ordersContainer.innerHTML = "<p>No past orders found.</p>";
+    } else {
+      orders.slice().reverse().forEach(order => {
+        const orderEl = document.createElement("div");
+        orderEl.classList.add("order-item");
+        orderEl.textContent = `${order.name} - $${order.price}`;
+        ordersContainer.appendChild(orderEl);
+      });
+    }
+
+    function logout() {
+      localStorage.removeItem("loggedIn");
+      window.location.href = "signin.html";
     }
   </script>
 </body>
