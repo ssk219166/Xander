@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Shopping - Electric Accessories</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #f4f4f4;
+    }
+
+    header {
+      background-color: #6366f1;
+      color: white;
+      padding: 15px 20px;
+      text-align: center;
+    }
+
+    nav {
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+      background-color: #fff;
+      padding: 10px;
+      box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+    }
+
+    nav a {
+      text-decoration: none;
+      color: #6366f1;
+      font-weight: bold;
+      padding: 10px 15px;
+      border-radius: 5px;
+      transition: background-color 0.3s ease;
+    }
+
+    nav a:hover {
+      background-color: #e0e7ff;
+    }
+
+    .products-section {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+      gap: 20px;
+      padding: 20px;
+      justify-items: center;
+    }
+
+    .product-card {
+      background: white;
+      padding: 15px;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+      border-radius: 10px;
+      text-align: center;
+      width: 100%;
+      max-width: 300px;
+    }
+
+    .product-card img {
+      width: 100%;
+      height: auto;
+      border-radius: 10px;
+    }
+
+    .product-card h3 {
+      font-size: 1.2rem;
+      margin-top: 10px;
+      color: #333;
+    }
+
+    .product-card p {
+      font-size: 1rem;
+      color: #555;
+      margin: 5px 0;
+    }
+
+    .product-card .price {
+      font-size: 1.1rem;
+      color: #6366f1;
+      font-weight: bold;
+    }
+
+    .product-card .buy-btn {
+      background-color: #6366f1;
+      color: white;
+      padding: 10px 15px;
+      border-radius: 5px;
+      cursor: pointer;
+      border: none;
+      font-weight: bold;
+      margin-top: 10px;
+      transition: background-color 0.3s ease;
+    }
+
+    .product-card .buy-btn:hover {
+      background-color: #4f46e5;
+    }
+
+    footer {
+      text-align: center;
+      padding: 20px;
+      background-color: #6366f1;
+      color: white;
+      font-size: 0.9rem;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>Electric Accessories Shopping</h1>
+  </header>
+
+  <nav>
+    <a href="index.html">🏠 Home</a>
+    <a href="profile.html">👤 Profile</a>
+    <a href="orders-list.html">📦 My Orders</a>
+    <a href="checkout.html">🛒 Checkout</a>
+  </nav>
+
+  <div class="products-section">
+    <div class="product-card">
+      <img src="https://example.com/charger.jpg" alt="Charger">
+      <h3>Fast Charger</h3>
+      <p>Quick charge your devices with this fast charger.</p>
+      <p class="price">$19.99</p>
+      <button class="buy-btn">Add to Cart</button>
+    </div>
+    <div class="product-card">
+      <img src="https://example.com/powerbank.jpg" alt="Power Bank">
+      <h3>Portable Power Bank</h3>
+      <p>Keep your devices powered on the go.</p>
+      <p class="price">$29.99</p>
+      <button class="buy-btn">Add to Cart</button>
+    </div>
+    <div class="product-card">
+      <img src="https://example.com/usb-cable.jpg" alt="USB Cable">
+      <h3>USB Type-C Cable</h3>
+      <p>Durable and fast data transfer USB cable.</p>
+      <p class="price">$9.99</p>
+      <button class="buy-btn">Add to Cart</button>
+    </div>
+    <div class="product-card">
+      <img src="https://example.com/bluetooth-headphones.jpg" alt="Bluetooth Headphones">
+      <h3>Wireless Bluetooth Headphones</h3>
+      <p>Enjoy music and hands-free calls with Bluetooth headphones.</p>
+      <p class="price">$49.99</p>
+      <button class="buy-btn">Add to Cart</button>
+    </div>
+  </div>
+
+  <footer>
+    <p>&copy; 2025 Xander | Online Shopping. All rights reserved.</p>
+  </footer>
+
+</body>
+</html>
