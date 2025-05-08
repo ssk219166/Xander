@@ -1,72 +1,55 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Profile | Xander</title>
+  <meta charset="UTF-8">
+  <title>User Profile</title>
   <style>
     body {
-      font-family: 'Segoe UI', sans-serif;
-      margin: 0;
-      background: linear-gradient(to bottom right, #fef3c7, #fbcfe8, #c4b5fd);
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      padding: 50px 20px;
-      animation: fadeIn 1s ease-in;
-    }
-
-    @keyframes fadeIn {
-      from { opacity: 0; }
-      to { opacity: 1; }
+      font-family: Arial, sans-serif;
+      padding: 40px;
+      background: #f3f4f6;
     }
 
     .profile-container {
-      background-color: white;
+      max-width: 600px;
+      margin: auto;
+      background: white;
       padding: 30px;
-      border-radius: 20px;
-      box-shadow: 0 8px 20px rgba(0,0,0,0.1);
-      max-width: 500px;
+      border-radius: 12px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+    }
+
+    input[type="text"], input[type="file"] {
       width: 100%;
-    }
-
-    h2 {
-      text-align: center;
-      color: #4f46e5;
+      padding: 12px;
+      margin-top: 10px;
       margin-bottom: 20px;
-    }
-
-    .profile-detail {
-      margin: 15px 0;
-      font-size: 1.1rem;
-    }
-
-    .orders-list {
-      margin-top: 30px;
-    }
-
-    .order-item {
-      background: #f3f4f6;
-      padding: 10px 15px;
       border-radius: 10px;
-      margin: 5px 0;
+      border: 1px solid #ddd;
+    }
+
+    .profile-preview {
+      width: 100px;
+      height: 100px;
+      object-fit: cover;
+      border-radius: 50%;
+      margin-bottom: 20px;
+      display: block;
     }
 
     button {
-      margin-top: 20px;
-      padding: 12px;
-      background-color: #ef4444;
+      background-color: #6366f1;
       color: white;
-      font-weight: bold;
+      padding: 12px;
       border: none;
       border-radius: 10px;
       width: 100%;
+      font-weight: bold;
       cursor: pointer;
-      transition: background 0.3s;
     }
 
     button:hover {
-      background-color: #dc2626;
+      background-color: #4f46e5;
     }
   </style>
 </head>
@@ -74,41 +57,36 @@
 
   <div class="profile-container">
     <h2>Your Profile</h2>
-    <div class="profile-detail" id="profileName">Name: </div>
-
-    <div class="orders-list">
-      <h3>Past Orders</h3>
-      <div id="ordersContainer"></div>
-    </div>
-
-    <button onclick="logout()">Logout</button>
+    <img src="" alt="Profile Picture" class="profile-preview" id="previewImg">
+    <input type="file" id="picInput">
+    <input type="text" id="userNameInput" placeholder="Enter your name">
+    <button onclick="saveProfile()">Save Profile</button>
   </div>
 
   <script>
-    const userData = JSON.parse(localStorage.getItem("userData"));
-    const orders = JSON.parse(localStorage.getItem("pastOrders")) || [];
+    const user = JSON.parse(localStorage.getItem("userData")) || {};
 
-    if (!userData || !localStorage.getItem("loggedIn")) {
-      window.location.href = "signin.html";
-    } else {
-      document.getElementById("profileName").textContent = `Name: ${userData.name}`;
-    }
+    const nameInput = document.getElementById("userNameInput");
+    const picInput = document.getElementById("picInput");
+    const preview = document.getElementById("previewImg");
 
-    const ordersContainer = document.getElementById("ordersContainer");
-    if (orders.length === 0) {
-      ordersContainer.innerHTML = "<p>No past orders found.</p>";
-    } else {
-      orders.slice().reverse().forEach(order => {
-        const orderEl = document.createElement("div");
-        orderEl.classList.add("order-item");
-        orderEl.textContent = `${order.name} - $${order.price}`;
-        ordersContainer.appendChild(orderEl);
-      });
-    }
+    if (user.name) nameInput.value = user.name;
+    if (user.profilePic) preview.src = user.profilePic;
 
-    function logout() {
-      localStorage.removeItem("loggedIn");
-      window.location.href = "signin.html";
+    picInput.addEventListener("change", () => {
+      const file = picInput.files[0];
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        preview.src = reader.result;
+        user.profilePic = reader.result;
+      };
+      if (file) reader.readAsDataURL(file);
+    });
+
+    function saveProfile() {
+      user.name = nameInput.value.trim();
+      localStorage.setItem("userData", JSON.stringify(user));
+      alert("Profile saved!");
     }
   </script>
 </body>
