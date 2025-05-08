@@ -5,32 +5,23 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Xander | Online Shopping</title>
   <style>
-    :root {
-      --bg-light: #ffffff;
-      --bg-dark: #1f2937;
-      --text-light: #1f2937;
-      --text-dark: #f3f4f6;
-      --primary: #6366f1;
-      --accent: #f472b6;
-    }
-
-    [data-theme="dark"] {
-      background-color: var(--bg-dark);
-      color: var(--text-dark);
-    }
-
     body {
       margin: 0;
       font-family: 'Segoe UI', sans-serif;
-      background: var(--bg-light);
-      color: var(--text-light);
-      transition: all 0.3s ease-in-out;
+      background: linear-gradient(to bottom right, #fbcfe8, #c4b5fd, #818cf8);
+      color: #333;
+      animation: fadeIn 1s ease-in;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
     }
 
     header {
       text-align: center;
       padding: 30px 20px;
-      background: linear-gradient(to right, var(--accent), var(--primary));
+      background: linear-gradient(to right, #f472b6, #818cf8);
       color: white;
       box-shadow: 0 5px 15px rgba(0,0,0,0.1);
     }
@@ -39,7 +30,7 @@
       display: flex;
       justify-content: center;
       align-items: center;
-      gap: 15px;
+      gap: 20px;
       background-color: #fff;
       padding: 15px 0;
       box-shadow: 0 4px 10px rgba(0,0,0,0.05);
@@ -47,14 +38,14 @@
 
     nav a, nav button {
       text-decoration: none;
-      color: var(--primary);
+      color: #4f46e5;
       font-weight: bold;
-      padding: 8px 14px;
+      padding: 8px 16px;
       border-radius: 10px;
-      border: none;
-      background: none;
-      cursor: pointer;
       transition: background 0.3s;
+      background: none;
+      border: none;
+      cursor: pointer;
     }
 
     nav a:hover, nav button:hover {
@@ -65,6 +56,7 @@
       padding: 50px 20px;
       max-width: 1200px;
       margin: auto;
+      animation: fadeIn 1s ease;
     }
 
     .products {
@@ -80,6 +72,16 @@
       box-shadow: 0 10px 15px rgba(0,0,0,0.1);
       text-align: center;
       transition: transform 0.3s ease;
+      opacity: 0;
+      transform: translateY(30px);
+      animation: slideUp 0.6s ease forwards;
+    }
+
+    @keyframes slideUp {
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
     }
 
     .card:hover {
@@ -87,8 +89,8 @@
     }
 
     .add-btn {
-      margin-top: 10px;
-      background-color: var(--primary);
+      margin-top: 15px;
+      background-color: #6366f1;
       color: white;
       padding: 10px;
       border: none;
@@ -100,6 +102,7 @@
     }
 
     .add-btn:hover {
+      background-color: #4f46e5;
       transform: scale(1.05);
     }
 
@@ -115,53 +118,6 @@
       display: flex;
       align-items: center;
       gap: 10px;
-      z-index: 1000;
-    }
-
-    .profile-badge {
-      position: fixed;
-      top: 20px;
-      right: 20px;
-      background: linear-gradient(135deg, var(--accent), #c084fc, #60a5fa);
-      background-size: 300% 300%;
-      animation: gradientShift 6s ease infinite;
-      color: white;
-      font-weight: bold;
-      font-size: 20px;
-      width: 55px;
-      height: 55px;
-      border-radius: 50%;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      text-decoration: none;
-      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
-      transition: transform 0.3s ease;
-    }
-
-    .profile-badge:hover {
-      transform: scale(1.1);
-    }
-
-    @keyframes gradientShift {
-      0% { background-position: 0% 50%; }
-      50% { background-position: 100% 50%; }
-      100% { background-position: 0% 50%; }
-    }
-
-    .toggle-dark {
-      position: fixed;
-      bottom: 20px;
-      right: 20px;
-      padding: 10px 14px;
-      background-color: var(--primary);
-      color: white;
-      border: none;
-      border-radius: 999px;
-      cursor: pointer;
-      box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-      font-weight: bold;
-      z-index: 999;
     }
 
     footer {
@@ -169,6 +125,7 @@
       padding: 20px;
       font-size: 0.85rem;
       background-color: #f9fafb;
+      color: #555;
     }
   </style>
 </head>
@@ -180,90 +137,41 @@
   </header>
 
   <nav>
-    <a href="#shop">🛍️ Shop</a>
-    <a href="#contact">📞 Contact</a>
-    <a href="signup.html" target="_blank">Sign Up</a>
+    <a href="shopping.html">🛍️ Shop</a>
+    <a href="profile.html">👤 Profile</a>
+    <a href="orders-list.html">📦 Orders</a>
     <button id="logoutBtn">🚪 Logout</button>
   </nav>
 
-  <div class="cart-box">
+  <div class="cart-box" id="cart-box">
     🛒 Cart: <span id="cart-count">0</span>
   </div>
 
-  <a href="profile.html" class="profile-badge" id="profileIcon" title="Your Profile" target="_blank">?</a>
-
   <section class="section" id="shop">
     <h2>🛍️ Shop Now</h2>
-    <div class="products">
-      <div class="card"><h3>Summer Tee</h3><p>Light, comfy style.</p><button class="add-btn" onclick="addToCart('Summer Tee', 15)">Add to Cart</button></div>
-      <div class="card"><h3>Winter Hoodie</h3><p>Stay warm and stylish.</p><button class="add-btn" onclick="addToCart('Winter Hoodie', 25)">Add to Cart</button></div>
-      <div class="card"><h3>Casual Shirt</h3><p>Simple daily wear.</p><button class="add-btn" onclick="addToCart('Casual Shirt', 20)">Add to Cart</button></div>
-      <div class="card"><h3>Exclusive Deal Tee</h3><p>Limited time only!</p><button class="add-btn" onclick="addToCart('Exclusive Deal Tee', 10)">Add to Cart</button></div>
-    </div>
+    <!-- Add more product cards here -->
   </section>
-
-  <section class="section" id="contact">
-    <h2>📞 Contact Us</h2>
-    <div class="contact-form">
-      <input type="text" placeholder="Your Name" required />
-      <input type="email" placeholder="Your Email" required />
-      <textarea rows="5" placeholder="Your Message"></textarea>
-      <button class="add-btn" onclick="alert('Message sent!')">Send</button>
-    </div>
-  </section>
-
-  <button class="toggle-dark" onclick="toggleDarkMode()">🌙 Toggle Dark</button>
 
   <footer>
     © 2025 Xander | Online Shopping. All rights reserved.
   </footer>
 
   <script>
-    // Redirect to signin if not logged in
-    if (!localStorage.getItem("loggedIn")) {
-      window.location.href = "signin.html";
-    }
-
-    // Live cart count
+    // Cart System using localStorage
     let cart = JSON.parse(localStorage.getItem("cart")) || [];
-    const cartCount = document.getElementById("cart-count");
-    cartCount.textContent = cart.length;
-
-    function addToCart(name, price) {
-      cart.push({ name, price });
-      localStorage.setItem("cart", JSON.stringify(cart));
-      cartCount.textContent = cart.length;
+    
+    function updateCartCount() {
+      const cartCount = document.getElementById("cart-count");
+      cartCount.innerText = cart.length;
     }
 
-    // Dark mode toggle
-    function toggleDarkMode() {
-      const theme = document.documentElement.getAttribute("data-theme");
-      if (theme === "dark") {
-        document.documentElement.removeAttribute("data-theme");
-        localStorage.setItem("theme", "light");
-      } else {
-        document.documentElement.setAttribute("data-theme", "dark");
-        localStorage.setItem("theme", "dark");
-      }
-    }
-
-    // Set initial theme
-    if (localStorage.getItem("theme") === "dark") {
-      document.documentElement.setAttribute("data-theme", "dark");
-    }
-
-    // Logout
     document.getElementById("logoutBtn").addEventListener("click", () => {
       localStorage.removeItem("loggedIn");
       window.location.href = "signin.html";
     });
 
-    // Profile badge initials
-    const userData = JSON.parse(localStorage.getItem("userData"));
-    if (userData?.name) {
-      const initials = userData.name.trim().split(" ").map(n => n[0]).join("").toUpperCase().slice(0, 2);
-      document.getElementById("profileIcon").textContent = initials;
-    }
+    // Update cart count on page load
+    updateCartCount();
   </script>
 
 </body>
