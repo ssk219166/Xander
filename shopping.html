@@ -127,34 +127,23 @@
       <h3>Fast Charger</h3>
       <p>Quick charge your devices with this fast charger.</p>
       <p class="price">$19.99</p>
-      <button class="buy-btn">Add to Cart</button>
+      <button class="buy-btn" onclick="addToCart('Fast Charger', 19.99)">Add to Cart</button>
     </div>
     <div class="product-card">
       <img src="https://example.com/powerbank.jpg" alt="Power Bank">
-      <h3>Portable Power Bank</h3>
-      <p>Keep your devices powered on the go.</p>
-      <p class="price">$29.99</p>
-      <button class="buy-btn">Add to Cart</button>
-    </div>
-    <div class="product-card">
-      <img src="https://example.com/usb-cable.jpg" alt="USB Cable">
-      <h3>USB Type-C Cable</h3>
-      <p>Durable and fast data transfer USB cable.</p>
-      <p class="price">$9.99</p>
-      <button class="buy-btn">Add to Cart</button>
-    </div>
-    <div class="product-card">
-      <img src="https://example.com/bluetooth-headphones.jpg" alt="Bluetooth Headphones">
-      <h3>Wireless Bluetooth Headphones</h3>
-      <p>Enjoy music and hands-free calls with Bluetooth headphones.</p>
-      <p class="price">$49.99</p>
-      <button class="buy-btn">Add to Cart</button>
-    </div>
-  </div>
+<h3>Portable Power Bank</h3>
+<p>Keep your devices powered on the go.</p>
+<p class="price">$29.99</p>
+<button class="buy-btn" onclick="addToCart('Portable Power Bank', 29.99)">Add to Cart</button>
+</div>
+<!-- Add more products as needed -->
 
-  <footer>
-    <p>&copy; 2025 Xander | Online Shopping. All rights reserved.</p>
-  </footer>
-
-</body>
-</html>
+</div> <footer> <p>&copy; 2025 Xander | Online Shopping. All rights reserved.</p> </footer>
+  
+  <script> 
+    function addToCart(productName, price) 
+    { let cart = JSON.parse(localStorage.getItem("cart"))
+    || []; cart.push({ name: productName, price: price }); localStorage.setItem("cart", JSON.stringify(cart)); alert(`${productName} added to cart!`); }
+  </script> 
+</body> 
+</html> 
