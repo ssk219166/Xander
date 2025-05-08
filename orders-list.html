@@ -1,136 +1,191 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Your Orders | Xander</title>
+  <title>Xander | Order History</title>
   <style>
+    :root {
+      --bg-light: #ffffff;
+      --bg-dark: #1f2937;
+      --text-light: #1f2937;
+      --text-dark: #f3f4f6;
+      --primary: #6366f1;
+      --accent: #f472b6;
+    }
+
+    [data-theme="dark"] {
+      background-color: var(--bg-dark);
+      color: var(--text-dark);
+    }
+
     body {
       margin: 0;
       font-family: 'Segoe UI', sans-serif;
-      background: linear-gradient(to right, #e0e7ff, #f0abfc);
-      color: #333;
+      background: var(--bg-light);
+      color: var(--text-light);
+      transition: all 0.3s ease-in-out;
     }
 
     header {
-      background: linear-gradient(to right, #818cf8, #f472b6);
-      color: white;
-      padding: 30px 20px;
       text-align: center;
-      box-shadow: 0 5px 10px rgba(0,0,0,0.1);
+      padding: 30px 20px;
+      background: linear-gradient(to right, var(--accent), var(--primary));
+      color: white;
     }
 
-    h1 {
-      margin: 0;
+    nav {
+      display: flex;
+      justify-content: center;
+      gap: 15px;
+      background-color: #fff;
+      padding: 10px;
+      box-shadow: 0 3px 10px rgba(0,0,0,0.05);
     }
 
-    .orders-container {
-      max-width: 1000px;
+    nav a, nav button {
+      text-decoration: none;
+      color: var(--primary);
+      font-weight: bold;
+      background: none;
+      border: none;
+      padding: 10px 14px;
+      cursor: pointer;
+      border-radius: 8px;
+    }
+
+    nav a:hover, nav button:hover {
+      background: #e0e7ff;
+    }
+
+    .section {
+      max-width: 800px;
       margin: 40px auto;
       padding: 20px;
-      background: white;
-      border-radius: 20px;
-      box-shadow: 0 10px 20px rgba(0,0,0,0.1);
     }
 
     .order {
-      border: 2px dashed #ddd;
-      border-radius: 15px;
-      padding: 20px;
-      margin-bottom: 20px;
-      animation: fadeIn 0.5s ease;
+      background: #f9fafb;
+      margin-top: 15px;
+      padding: 10px;
+      border-radius: 12px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
     }
 
-    .order h3 {
-      margin: 0 0 10px;
-      color: #4f46e5;
+    .order span {
+      font-weight: bold;
     }
 
-    .order-item {
-      padding: 8px 0;
-      border-bottom: 1px solid #eee;
+    .order button {
+      background: var(--accent);
+      border: none;
+      color: white;
+      padding: 6px 12px;
+      margin-left: 8px;
+      border-radius: 8px;
+      cursor: pointer;
     }
 
-    .order-item:last-child {
-      border-bottom: none;
-    }
-
-    .no-orders {
-      text-align: center;
-      color: #888;
-      padding: 50px;
-      font-size: 1.2rem;
-    }
-
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(10px); }
-      to { opacity: 1; transform: translateY(0); }
+    .toggle-dark {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      padding: 10px 14px;
+      background-color: var(--primary);
+      color: white;
+      border: none;
+      border-radius: 999px;
+      cursor: pointer;
+      font-weight: bold;
     }
 
     footer {
       text-align: center;
       padding: 20px;
       font-size: 0.85rem;
-      color: #666;
-    }
-
-    .back-btn {
-      display: inline-block;
-      margin-bottom: 20px;
-      padding: 10px 20px;
-      background: #6366f1;
-      color: white;
-      border: none;
-      border-radius: 12px;
-      cursor: pointer;
-      font-weight: bold;
-      text-decoration: none;
-      transition: background 0.3s;
-    }
-
-    .back-btn:hover {
-      background: #4f46e5;
     }
   </style>
 </head>
 <body>
+
   <header>
-    <h1>📦 Your Orders</h1>
-    <p>See your order history below</p>
+    <h1>Your Order History</h1>
   </header>
 
-  <div class="orders-container">
-    <a href="profile.html" class="back-btn">← Back to Profile</a>
-    <div id="orders-list"></div>
+  <nav>
+    <a href="index.html">🏠 Home</a>
+    <a href="profile.html">👤 Profile</a>
+  </nav>
+
+  <div class="section">
+    <h3>🧾 Order History</h3>
+    <div id="orderList"></div>
   </div>
 
-  <footer>
-    © 2025 Xander | Online Shopping. All rights reserved.
-  </footer>
+  <button class="toggle-dark" onclick="toggleDarkMode()">🌙 Toggle Dark</button>
+
+  <footer>© 2025 Xander | Online Shopping. All rights reserved.</footer>
 
   <script>
-    const ordersList = document.getElementById("orders-list");
+    // Dark mode
+    function toggleDarkMode() {
+      const theme = document.documentElement.getAttribute("data-theme");
+      if (theme === "dark") {
+        document.documentElement.removeAttribute("data-theme");
+        localStorage.setItem("theme", "light");
+      } else {
+        document.documentElement.setAttribute("data-theme", "dark");
+        localStorage.setItem("theme", "dark");
+      }
+    }
+
+    if (localStorage.getItem("theme") === "dark") {
+      document.documentElement.setAttribute("data-theme", "dark");
+    }
+
+    // Order history
+    const orderList = document.getElementById("orderList");
     const pastOrders = JSON.parse(localStorage.getItem("pastOrders")) || [];
 
-    if (pastOrders.length === 0) {
-      ordersList.innerHTML = `<div class="no-orders">You haven’t placed any orders yet.</div>`;
-    } else {
+    function renderOrders() {
+      orderList.innerHTML = "";
       pastOrders.forEach((order, index) => {
-        const orderDiv = document.createElement("div");
-        orderDiv.className = "order";
-        orderDiv.innerHTML = `
-          <h3>🧾 Order #${index + 1}</h3>
-          <p><strong>Date:</strong> ${order.date}</p>
-          <p><strong>Total:</strong> $${order.total}</p>
+        const div = document.createElement("div");
+        div.className = "order";
+        div.innerHTML = `
           <div>
-            ${order.items.map(item => `
-              <div class="order-item">• ${item.name} - $${item.price}</div>
-            `).join("")}
+            <span>${order.name}</span> - $${order.price}
+          </div>
+          <div>
+            <button onclick="editOrder(${index})">✏️</button>
+            <button onclick="deleteOrder(${index})">🗑️</button>
           </div>
         `;
-        ordersList.appendChild(orderDiv);
+        orderList.appendChild(div);
       });
     }
+
+    function deleteOrder(index) {
+      pastOrders.splice(index, 1);
+      localStorage.setItem("pastOrders", JSON.stringify(pastOrders));
+      renderOrders();
+    }
+
+    function editOrder(index) {
+      const newName = prompt("Update product name:", pastOrders[index].name);
+      const newPrice = prompt("Update price:", pastOrders[index].price);
+      if (newName && newPrice) {
+        pastOrders[index].name = newName;
+        pastOrders[index].price = newPrice;
+        localStorage.setItem("pastOrders", JSON.stringify(pastOrders));
+        renderOrders();
+      }
+    }
+
+    renderOrders();
   </script>
+
 </body>
 </html>
