@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Xander | Track My Orders</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+* { margin:0; padding:0; box-sizing:border-box; font-family:'Poppins',sans-serif; }
+body { background:linear-gradient(270deg,#ff758c,#ff7eb3,#9face6); background-size:600% 600%; animation:gradientBG 15s ease infinite; color:#fff; transition:0.5s;}
+@keyframes gradientBG {0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%}}
+header { display:flex; justify-content:space-between; align-items:center; padding:15px 40px; background: rgba(0,0,0,0.4); backdrop-filter: blur(10px); position: sticky; top:0; z-index:1000;}
+header h1 { font-size:1.8rem; font-weight:700;}
+nav a { margin:0 15px; text-decoration:none; color:#fff; font-weight:500; position:relative;}
+nav a::after { content:''; position:absolute; width:0; height:2px; bottom:-5px; left:0; background:#fff; transition:width 0.3s;}
+nav a:hover::after { width:100%; }
+.profile-btn { background:#fff; color:#333; border-radius:10px; width:40px; height:40px; display:flex; align-items:center; justify-content:center; font-weight:bold; cursor:pointer; box-shadow:0 4px 8px rgba(0,0,0,0.2); transition:transform 0.3s; }
+.profile-btn:hover { transform:scale(1.1); }
+
+main { padding:30px; max-width:700px; margin:auto; background:rgba(255,255,255,0.1); backdrop-filter:blur(10px); border-radius:15px; box-shadow:0 8px 20px rgba(0,0,0,0.3);}
+h2 { margin-bottom:20px; text-align:center; }
+.order-item { background: rgba(255,255,255,0.2); margin:10px 0; padding:15px; border-radius:10px; display:flex; justify-content:space-between; align-items:center; }
+.order-item span { font-weight:600; }
+.order-item button { padding:6px 12px; border:none; border-radius:5px; cursor:pointer; background:orange; color:#fff; transition:0.3s; }
+.order-item button:hover { background:red; }
+</style>
+</head>
+<body>
+
+<header>
+<h1>Xander</h1>
+<nav>
+  <a href="index.html">Home</a>
+  <a href="shopping.html">Shop</a>
+  <a href="cart.html">Cart</a>
+  <a href="profile.html">Profile</a>
+</nav>
+<div style="display:flex;align-items:center;gap:10px;">
+  <span id="cart-count">🛒 0</span>
+  <div class="profile-btn" onclick="window.location.href='profile.html'">U</div>
+</div>
+</header>
+
+<main>
+<h2>Track My Orders</h2>
+<div id="ordersContainer">
+  <p>Loading your orders...</p>
+</div>
+</main>
+
+<script>
+// Load profile initial & cart count
+function loadProfileInitial() {
+  const name = localStorage.getItem('username') || 'U';
+  document.querySelector('.profile-btn').textContent = name.charAt(0).toUpperCase();
+}
+function updateCartCount() {
+  const cart = JSON.parse(localStorage.getItem('cart') || '[]');
+  document.getElementById('cart-count').textContent = `🛒 ${cart.length}`;
+}
+loadProfileInitial();
+updateCartCount();
+
+// Load orders
+function loadOrders() {
+  const orders = JSON.parse(localStorage.getItem('pastOrders') || '[]');
+  const container = document.getElementById('ordersContainer');
+  container.innerHTML = '';
+  if(!orders.length){
+    container.innerHTML = "<p>No orders placed yet.</p>";
+    return;
+  }
+  orders.forEach((order, index)=>{
+    const div = document.createElement('div');
+    div.className='order-item';
+    div.innerHTML = `
+      <span>${order.name} - $${order.price} (x${order.quantity || 1})</span>
+      <button onclick="deleteOrder(${index})">Delete</button>
+    `;
+    container.appendChild(div);
+  });
+}
+
+// Delete order
+function deleteOrder(index){
+  let orders = JSON.parse(localStorage.getItem('pastOrders') || '[]');
+  orders.splice(index,1);
+  localStorage.setItem('pastOrders', JSON.stringify(orders));
+  loadOrders();
+}
+
+loadOrders();
+</script>
+
+</body>
+</html>
