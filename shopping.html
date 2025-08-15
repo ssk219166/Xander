@@ -1,149 +1,186 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Shopping - Electric Accessories</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      margin: 0;
-      padding: 0;
-      background-color: #f4f4f4;
-    }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Xander | Shop</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+* { margin:0; padding:0; box-sizing:border-box; font-family:'Poppins', sans-serif; }
 
-    header {
-      background-color: #6366f1;
-      color: white;
-      padding: 15px 20px;
-      text-align: center;
-    }
+body {
+  color: #fff;
+  background: linear-gradient(270deg, #ff758c, #ff7eb3, #9face6);
+  background-size: 600% 600%;
+  animation: gradientBG 15s ease infinite;
+}
 
-    nav {
-      display: flex;
-      justify-content: center;
-      gap: 20px;
-      background-color: #fff;
-      padding: 10px;
-      box-shadow: 0 3px 10px rgba(0,0,0,0.1);
-    }
+@keyframes gradientBG {
+  0% { background-position:0% 50%; }
+  50% { background-position:100% 50%; }
+  100% { background-position:0% 50%; }
+}
 
-    nav a {
-      text-decoration: none;
-      color: #6366f1;
-      font-weight: bold;
-      padding: 10px 15px;
-      border-radius: 5px;
-      transition: background-color 0.3s ease;
-    }
+header {
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding:15px 40px;
+  background: rgba(0,0,0,0.4);
+  backdrop-filter: blur(10px);
+  position: sticky;
+  top:0;
+  z-index:1000;
+}
 
-    nav a:hover {
-      background-color: #e0e7ff;
-    }
+header h1 { font-size:1.8rem; font-weight:700; }
+nav a { margin:0 15px; text-decoration:none; color:#fff; font-weight:500; }
+.profile-btn {
+  background:#fff;
+  color:#333;
+  border-radius:10px;
+  width:40px;
+  height:40px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-weight:bold;
+  cursor:pointer;
+  box-shadow:0 4px 8px rgba(0,0,0,0.2);
+}
 
-    .products-section {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-      gap: 20px;
-      padding: 20px;
-      justify-items: center;
-    }
+main { padding:50px 20px; max-width:1200px; margin:0 auto; }
 
-    .product-card {
-      background: white;
-      padding: 15px;
-      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-      border-radius: 10px;
-      text-align: center;
-      width: 100%;
-      max-width: 300px;
-    }
+h2 { text-align:center; margin-bottom:30px; font-size:2.5rem; }
 
-    .product-card img {
-      width: 100%;
-      height: auto;
-      border-radius: 10px;
-    }
+.products {
+  display:grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px,1fr));
+  gap:20px;
+}
 
-    .product-card h3 {
-      font-size: 1.2rem;
-      margin-top: 10px;
-      color: #333;
-    }
+.product-card {
+  background: rgba(255,255,255,0.1);
+  backdrop-filter: blur(10px);
+  border-radius:15px;
+  overflow:hidden;
+  text-align:center;
+  padding:15px;
+  transition: transform 0.3s, box-shadow 0.3s;
+}
 
-    .product-card p {
-      font-size: 1rem;
-      color: #555;
-      margin: 5px 0;
-    }
+.product-card img { width:100%; border-radius:10px; margin-bottom:15px; }
+.product-card:hover { transform: translateY(-5px); box-shadow:0 8px 20px rgba(0,0,0,0.3); }
 
-    .product-card .price {
-      font-size: 1.1rem;
-      color: #6366f1;
-      font-weight: bold;
-    }
+.product-card h3 { margin-bottom:10px; }
+.product-card p { margin-bottom:10px; font-weight:600; }
 
-    .product-card .buy-btn {
-      background-color: #6366f1;
-      color: white;
-      padding: 10px 15px;
-      border-radius: 5px;
-      cursor: pointer;
-      border: none;
-      font-weight: bold;
-      margin-top: 10px;
-      transition: background-color 0.3s ease;
-    }
+.product-card button {
+  background:#fff;
+  color:#333;
+  padding:8px 15px;
+  border:none;
+  border-radius:20px;
+  cursor:pointer;
+  transition:0.3s;
+}
+.product-card button:hover { background:#ffdfdf; }
 
-    .product-card .buy-btn:hover {
-      background-color: #4f46e5;
-    }
+.quantity-input {
+  width:60px;
+  padding:5px;
+  border-radius:5px;
+  border:none;
+  margin-bottom:10px;
+  text-align:center;
+}
 
-    footer {
-      text-align: center;
-      padding: 20px;
-      background-color: #6366f1;
-      color: white;
-      font-size: 0.9rem;
-    }
-  </style>
+</style>
 </head>
 <body>
 
-  <header>
-    <h1>Electric Accessories Shopping</h1>
-  </header>
-
+<header>
+  <h1>Xander</h1>
   <nav>
-    <a href="index.html">🏠 Home</a>
-    <a href="profile.html">👤 Profile</a>
-    <a href="orders-list.html">📦 My Orders</a>
-    <a href="checkout.html">🛒 Checkout</a>
+    <a href="index.html">Home</a>
+    <a href="shopping.html">Shop</a>
+    <a href="cart.html">Cart</a>
+    <a href="profile.html">Profile</a>
   </nav>
+  <div style="display:flex;align-items:center;gap:10px;">
+    <span id="cartCount">🛒 0</span>
+    <div class="profile-btn" onclick="window.location.href='profile.html'">U</div>
+  </div>
+</header>
 
-  <div class="products-section">
-    <div class="product-card">
-      <img src="https://example.com/charger.jpg" alt="Charger">
-      <h3>Fast Charger</h3>
-      <p>Quick charge your devices with this fast charger.</p>
-      <p class="price">$19.99</p>
-      <button class="buy-btn" onclick="addToCart('Fast Charger', 19.99)">Add to Cart</button>
-    </div>
-    <div class="product-card">
-      <img src="https://example.com/powerbank.jpg" alt="Power Bank">
-<h3>Portable Power Bank</h3>
-<p>Keep your devices powered on the go.</p>
-<p class="price">$29.99</p>
-<button class="buy-btn" onclick="addToCart('Portable Power Bank', 29.99)">Add to Cart</button>
-</div>
-<!-- Add more products as needed -->
+<main>
+  <h2>Shop Our Products</h2>
+  <div class="products" id="productContainer"></div>
+</main>
 
-</div> <footer> <p>&copy; 2025 Xander | Online Shopping. All rights reserved.</p> </footer>
+<script>
+// Sample products array
+const products = [
+  { name:"Stylish T-Shirt", price:20, img:"https://via.placeholder.com/300x300?text=T-Shirt" },
+  { name:"Wireless Headphones", price:50, img:"https://via.placeholder.com/300x300?text=Headphones" },
+  { name:"Running Shoes", price:70, img:"https://via.placeholder.com/300x300?text=Shoes" },
+  { name:"Smartphone", price:300, img:"https://via.placeholder.com/300x300?text=Phone" },
+  { name:"Camera", price:250, img:"https://via.placeholder.com/300x300?text=Camera" },
+  { name:"USB Cables", price:10, img:"https://via.placeholder.com/300x300?text=Cables" }
+];
+
+// Load profile initial
+function loadProfileInitial() {
+  const name = localStorage.getItem('username') || 'U';
+  document.querySelector('.profile-btn').textContent = name.charAt(0).toUpperCase();
+}
+
+// Update cart count
+function updateCartCount() {
+  const cart = JSON.parse(localStorage.getItem('cart') || '[]');
+  document.getElementById('cartCount').textContent = `🛒 ${cart.length}`;
+}
+
+// Render products
+function renderProducts() {
+  const container = document.getElementById('productContainer');
+  container.innerHTML = "";
+  products.forEach((product,index)=>{
+    container.innerHTML += `
+      <div class="product-card">
+        <img src="${product.img}" alt="${product.name}">
+        <h3>${product.name}</h3>
+        <p>$${product.price}</p>
+        <input type="number" class="quantity-input" id="qty${index}" value="1" min="1">
+        <button onclick="addToCart(${index})">Add to Cart</button>
+      </div>`;
+  });
+}
+
+// Add to cart
+function addToCart(index){
+  const qty = parseInt(document.getElementById(`qty${index}`).value) || 1;
+  const cart = JSON.parse(localStorage.getItem('cart') || '[]');
+  const product = products[index];
   
-  <script> 
-    function addToCart(productName, price) 
-    { let cart = JSON.parse(localStorage.getItem("cart"))
-    || []; cart.push({ name: productName, price: price }); localStorage.setItem("cart", JSON.stringify(cart)); alert(`${productName} added to cart!`); }
-  </script> 
-</body> 
-</html> 
+  // Check if already in cart
+  const existing = cart.find(item => item.name === product.name);
+  if(existing){
+    existing.quantity = (existing.quantity || 1) + qty;
+  } else {
+    cart.push({ name: product.name, price: product.price, quantity: qty });
+  }
+  
+  localStorage.setItem('cart', JSON.stringify(cart));
+  updateCartCount();
+  alert(`${product.name} added to cart!`);
+}
+
+// Initialize
+loadProfileInitial();
+updateCartCount();
+renderProducts();
+</script>
+
+</body>
+</html>
