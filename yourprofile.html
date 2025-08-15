@@ -1,117 +1,156 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Your Profile | Xander</title>
-  <style>
-    body {
-      margin: 0;
-      font-family: 'Segoe UI', sans-serif;
-      background: linear-gradient(to bottom right, #fdf2f8, #c4b5fd);
-      color: #333;
-    }
-
-    header {
-      background: linear-gradient(to right, #f472b6, #818cf8);
-      color: white;
-      text-align: center;
-      padding: 30px 20px;
-    }
-
-    .profile-container {
-      max-width: 600px;
-      margin: 40px auto;
-      background: white;
-      padding: 30px;
-      border-radius: 20px;
-      box-shadow: 0 10px 25px rgba(0,0,0,0.1);
-      animation: fadeIn 0.6s ease;
-    }
-
-    h2 {
-      text-align: center;
-      color: #4f46e5;
-    }
-
-    .profile-info {
-      margin-top: 30px;
-      line-height: 2;
-      font-size: 1.1rem;
-    }
-
-    .profile-info strong {
-      color: #6b21a8;
-    }
-
-    button {
-      margin-top: 30px;
-      display: block;
-      width: 100%;
-      padding: 12px;
-      font-size: 1rem;
-      font-weight: bold;
-      background: #6366f1;
-      color: white;
-      border: none;
-      border-radius: 10px;
-      cursor: pointer;
-      transition: background 0.3s ease;
-    }
-
-    button:hover {
-      background: #4f46e5;
-    }
-
-    footer {
-      text-align: center;
-      padding: 20px;
-      background-color: #f9fafb;
-      color: #555;
-      margin-top: 50px;
-      font-size: 0.9rem;
-    }
-
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(20px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Xander | Profile</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+* { margin:0; padding:0; box-sizing:border-box; font-family:'Poppins', sans-serif; }
+body { background:#f5f5f5; color:#333; }
+header { background:#0072ff; color:white; padding:15px 40px; display:flex; justify-content:space-between; align-items:center; }
+header h1 { font-weight:700; }
+nav a { margin:0 15px; color:white; text-decoration:none; font-weight:500; }
+.profile-btn { background:#fff; color:#333; border-radius:10px; width:50px; height:50px; display:flex; align-items:center; justify-content:center; font-weight:bold; cursor:pointer; box-shadow:0 4px 8px rgba(0,0,0,0.2); }
+main { padding:20px; max-width:1200px; margin:0 auto; }
+section { background:white; padding:15px; margin-bottom:20px; border-radius:8px; box-shadow:0 2px 6px rgba(0,0,0,0.1); }
+h2 { margin-bottom:10px; }
+.item { display:flex; justify-content:space-between; margin:8px 0; border-bottom:1px solid #eee; padding-bottom:5px; }
+.item button { background:red; color:white; border:none; padding:4px 8px; border-radius:5px; cursor:pointer; margin-left:5px; }
+.item button.edit { background:orange; }
+</style>
 </head>
 <body>
 
-  <header>
-    <h1>👤 Customer Profile</h1>
-    <p>Welcome to your personal area</p>
-  </header>
+<header>
+  <h1>Profile</h1>
+  <nav>
+    <a href="index.html">Home</a>
+    <a href="shopping.html">Shop</a>
+    <a href="cart.html">Cart</a>
+  </nav>
+  <div class="profile-btn" onclick="window.location.href='profile.html'">U</div>
+</header>
 
-  <div class="profile-container">
-    <h2>Your Profile Details</h2>
-    <div class="profile-info">
-      <p><strong>Name:</strong> Xander User</p>
-      <p><strong>Email:</strong> ksethum2011@gmail.com</p>
-      <p><strong>Phone:</strong> +94 77 123 4567</p>
-      <p><strong>Address:</strong> 123, Fashion Street, Colombo, Sri Lanka</p>
-      <p><strong>Order History:</strong> 5 Orders</p>
-    </div>
-    <button onclick="logout()">Logout</button>
-  </div>
+<main>
+  <!-- User Info -->
+  <section>
+    <h2>User Info</h2>
+    <p><strong>Username:</strong> <span id="usernameDisplay"></span></p>
+    <p><strong>Email:</strong> <span id="emailDisplay"></span></p>
+  </section>
 
-  <footer>
-    &copy; 2025 Xander | Online Shopping. All rights reserved.
-  </footer>
+  <!-- Orders -->
+  <section>
+    <h2>My Orders</h2>
+    <div id="ordersList"></div>
+  </section>
 
-  <script>
-    // Redirect to sign in if not logged in
-    if (!localStorage.getItem("loggedIn")) {
-      window.location.href = "signin.html";
-    }
+  <!-- Cart -->
+  <section>
+    <h2>My Cart</h2>
+    <div id="cartList"></div>
+  </section>
 
-    function logout() {
-      localStorage.removeItem("loggedIn");
-      window.location.href = "signin.html";
-    }
-  </script>
+  <!-- Favorites -->
+  <section>
+    <h2>My Favorites</h2>
+    <div id="favoritesList"></div>
+  </section>
+</main>
+
+<script>
+// Load profile initial
+function loadProfileInitial() {
+  const name = localStorage.getItem('username') || 'U';
+  document.querySelector('.profile-btn').textContent = name.charAt(0).toUpperCase();
+  document.getElementById('usernameDisplay').textContent = localStorage.getItem('username') || "Guest";
+  document.getElementById('emailDisplay').textContent = localStorage.getItem('email') || "Not set";
+}
+
+// Load dynamic lists
+function loadProfileData() {
+  // Orders
+  const orders = JSON.parse(localStorage.getItem('pastOrders') || '[]');
+  const ordersList = document.getElementById('ordersList');
+  ordersList.innerHTML = orders.length ? "" : "<p>No orders yet.</p>";
+  orders.forEach((order, index) => {
+    ordersList.innerHTML += `
+    <div class="item">
+      <span>${order.name} (x${order.quantity || 1}) - $${order.price}</span>
+      <div>
+        <button class="edit" onclick="editOrder(${index})">Edit</button>
+        <button onclick="deleteOrder(${index})">Delete</button>
+      </div>
+    </div>`;
+  });
+
+  // Cart
+  const cart = JSON.parse(localStorage.getItem('cart') || '[]');
+  const cartList = document.getElementById('cartList');
+  cartList.innerHTML = cart.length ? "" : "<p>Your cart is empty.</p>";
+  cart.forEach((item,index)=>{
+    cartList.innerHTML += `
+    <div class="item">
+      <span>${item.name} (x${item.quantity || 1}) - $${item.price}</span>
+      <div>
+        <button class="edit" onclick="updateCart(${index})">Update</button>
+        <button onclick="removeCart(${index})">Remove</button>
+      </div>
+    </div>`;
+  });
+
+  // Favorites
+  const favorites = JSON.parse(localStorage.getItem('favorites') || '[]');
+  const favoritesList = document.getElementById('favoritesList');
+  favoritesList.innerHTML = favorites.length ? "" : "<p>No favorites yet.</p>";
+  favorites.forEach((fav,index)=>{
+    favoritesList.innerHTML += `
+    <div class="item">
+      <span>${fav.name}</span>
+      <button onclick="removeFavorite(${index})">Remove</button>
+    </div>`;
+  });
+}
+
+// Orders functions
+function deleteOrder(index){
+  let orders = JSON.parse(localStorage.getItem('pastOrders') || '[]');
+  orders.splice(index,1);
+  localStorage.setItem('pastOrders',JSON.stringify(orders));
+  loadProfileData();
+}
+function editOrder(index){
+  let orders = JSON.parse(localStorage.getItem('pastOrders') || '[]');
+  const newName = prompt("Update order name:", orders[index].name);
+  if(newName){ orders[index].name = newName; localStorage.setItem('pastOrders',JSON.stringify(orders)); loadProfileData(); }
+}
+
+// Cart functions
+function removeCart(index){
+  let cart = JSON.parse(localStorage.getItem('cart') || '[]');
+  cart.splice(index,1);
+  localStorage.setItem('cart',JSON.stringify(cart));
+  loadProfileData();
+}
+function updateCart(index){
+  let cart = JSON.parse(localStorage.getItem('cart') || '[]');
+  const newQty = parseInt(prompt("Enter new quantity:", cart[index].quantity || 1));
+  if(newQty > 0){ cart[index].quantity = newQty; localStorage.setItem('cart',JSON.stringify(cart)); loadProfileData(); }
+}
+
+// Favorites functions
+function removeFavorite(index){
+  let favorites = JSON.parse(localStorage.getItem('favorites') || '[]');
+  favorites.splice(index,1);
+  localStorage.setItem('favorites',JSON.stringify(favorites));
+  loadProfileData();
+}
+
+// Initialize
+loadProfileInitial();
+loadProfileData();
+</script>
 
 </body>
 </html>
