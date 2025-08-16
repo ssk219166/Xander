@@ -1,12 +1,12 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
+<meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Xander | Sign Up</title>
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+<title>Sign Up | Xander</title>
+<script type="module" src="firebase-config.js"></script>
 <style>
-  body {
+    body {
     font-family: 'Poppins', sans-serif;
     background: linear-gradient(270deg, #00c6ff, #0072ff, #9face6);
     background-size: 600% 600%;
@@ -45,36 +45,37 @@
 </style>
 </head>
 <body>
+<h2>Sign Up</h2>
+<form id="signupForm">
+  <input type="text" placeholder="Username" id="username" required /><br/>
+  <input type="email" placeholder="Email" id="email" required /><br/>
+  <input type="password" placeholder="Password" id="password" required /><br/>
+  <button type="submit">Sign Up</button>
+</form>
+<p>Already have an account? <a href="signin.html">Sign In</a></p>
 
-<div class="box">
-  <h2>Create Account</h2>
-  <input type="text" id="signup-username" placeholder="Username" required>
-  <input type="email" id="signup-email" placeholder="Email" required>
-  <input type="password" id="signup-password" placeholder="Password" required>
-  <button onclick="signupUser()">Sign Up</button>
-  <p>Already have an account? <a href="signin.html">Sign In</a></p>
-</div>
+<script type="module">
+import { auth } from './firebase-config.js';
+import { createUserWithEmailAndPassword, updateProfile } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
 
-<script>
-function signupUser() {
-  const username = document.getElementById('signup-username').value.trim();
-  const email = document.getElementById('signup-email').value.trim();
-  const password = document.getElementById('signup-password').value.trim();
+const form = document.getElementById('signupForm');
+form.addEventListener('submit', async e=>{
+  e.preventDefault();
+  const username = document.getElementById('username').value;
+  const email = document.getElementById('email').value;
+  const password = document.getElementById('password').value;
 
-  if (!username || !email || !password) {
-    alert("Please fill in all fields.");
-    return;
+  try{
+    const userCredential = await createUserWithEmailAndPassword(auth,email,password);
+    await updateProfile(userCredential.user,{displayName: username});
+    localStorage.setItem('username',username);
+    localStorage.setItem('email',email);
+    alert('Sign Up successful!');
+    window.location.href='index.html';
+  }catch(error){
+    alert(error.message);
   }
-
-  // Save credentials to localStorage
-  localStorage.setItem('username', username);
-  localStorage.setItem('email', email);
-  localStorage.setItem('password', password); // not secure, but for demo purposes
-
-  // Redirect to profile
-  window.location.href = "profile.html";
-}
+});
 </script>
-
 </body>
 </html>
