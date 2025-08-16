@@ -4,262 +4,55 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Xander | Admin Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
 <style>
-/* General */
-body {
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  background: #f0f2f5;
-  margin: 0;
-  padding: 20px;
-}
-h1 {
-  text-align: center;
-  color: #1a1a1a;
-  margin-bottom: 20px;
-}
-
-/* Controls */
-.controls {
-  display: flex;
-  justify-content: space-between;
-  margin-bottom: 15px;
-  flex-wrap: wrap;
-  gap: 10px;
-}
-.controls input, .controls select {
-  padding: 8px 10px;
-  border-radius: 5px;
-  font-size: 14px;
-}
-
-/* Table */
-table {
-  width: 100%;
-  border-collapse: collapse;
-  background: white;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-  margin-bottom: 30px;
-}
-th, td {
-  padding: 12px;
-  border-bottom: 1px solid #ddd;
-  text-align: left;
-  font-size: 14px;
-  vertical-align: top;
-}
-th {
-  background: #333;
-  color: white;
-  text-transform: uppercase;
-  font-weight: 600;
-}
-tr:hover {
-  background: #f9f9f9;
-}
-
-/* Status & buttons */
-.status {
-  font-weight: bold;
-  padding: 5px 10px;
-  border-radius: 6px;
-  display: inline-block;
-  min-width: 80px;
-  text-align: center;
-}
-.Processing { background: orange; color: white; }
-.Shipped { background: dodgerblue; color: white; }
-.Delivered { background: green; color: white; }
-.next-btn {
-  padding: 5px 10px;
-  margin-left: 5px;
-  background: #4CAF50;
-  color: white;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-}
-.next-btn:hover { background: #45a049; }
-
-/* Progress Steps */
-.progress-container {
-  position: relative;
-  height: 6px;
-  background: #ddd;
-  border-radius: 3px;
-  margin: 10px 0 5px 0;
-}
-.progress {
-  height: 6px;
-  background: linear-gradient(90deg,#4caf50,#2ecc71);
-  border-radius: 3px;
-  width: 0;
-  transition: width 0.5s ease-in-out;
-}
-.step {
-  position: absolute;
-  top: -15px;
-  transform: translateX(-50%);
-  text-align: center;
-  width: 60px;
-}
-.step .circle {
-  width: 20px;
-  height: 20px;
-  border-radius: 50%;
-  background: #bbb;
-  color: white;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin: 0 auto 3px;
-  font-size: 10px;
-  transition: background 0.5s ease-in-out, transform 0.3s;
-}
-.step.active .circle {
-  background: #4caf50;
-  transform: scale(1.1);
-  box-shadow: 0 0 5px rgba(76,175,80,0.8);
-}
-.step .label {
-  font-size: 10px;
-  color: #555;
-}
+body { font-family:'Poppins', sans-serif; background:#f0f2f5; padding:30px; }
+h1 { text-align:center; margin-bottom:30px; }
+.order-card { background:white; border-radius:10px; padding:15px; margin-bottom:15px; box-shadow:0 4px 10px rgba(0,0,0,0.1); }
+button { padding:5px 12px; border:none; border-radius:5px; background:#4caf50; color:white; cursor:pointer; transition:0.3s; }
+button:hover { background:#45a049; }
 </style>
 </head>
 <body>
 
-<h1>📦 Xander Admin Dashboard</h1>
-
-<div class="controls">
-  <input type="text" id="searchInput" placeholder="Search by customer...">
-  <select id="statusFilter">
-    <option value="">All Statuses</option>
-    <option value="Processing">Processing</option>
-    <option value="Shipped">Shipped</option>
-    <option value="Delivered">Delivered</option>
-  </select>
-</div>
-
-<table>
-  <thead>
-    <tr>
-      <th>Customer</th>
-      <th>Items</th>
-      <th>Total ($)</th>
-      <th>Status</th>
-      <th>Update</th>
-    </tr>
-  </thead>
-  <tbody id="ordersTable"></tbody>
-</table>
+<h1>Admin Dashboard</h1>
+<div id="adminOrdersContainer"></div>
 
 <script>
-// Load orders from localStorage or create sample data
-let ordersData = JSON.parse(localStorage.getItem('pastOrders') || '[]');
-if (!ordersData.length) {
-  ordersData = [
-    { customer: "Alice", items:[{name:"Phone", quantity:1}], total:500, status:"Processing", statusStep:0 },
-    { customer: "Bob", items:[{name:"Camera", quantity:2}], total:1200, status:"Processing", statusStep:0 }
-  ];
-  localStorage.setItem('pastOrders', JSON.stringify(ordersData));
-}
+function loadOrdersForAdmin() {
+  let orders = JSON.parse(localStorage.getItem('pastOrders') || '[]');
+  const container = document.getElementById('adminOrdersContainer');
+  container.innerHTML = '';
 
-// Render orders table
-function renderOrdersTable() {
-  const table = document.getElementById("ordersTable");
-  const searchValue = document.getElementById("searchInput").value.toLowerCase();
-  const statusFilter = document.getElementById("statusFilter").value;
-  table.innerHTML = "trackorder.html";
-
-  ordersData
-    .filter(order =>
-      (!statusFilter || order.status === statusFilter) &&
-      (!searchValue || order.customer.toLowerCase().includes(searchValue))
-    )
-    .forEach((order, index) => {
-      const tr = document.createElement("tr");
-      const itemsList = order.items.map(i => `${i.name} (x${i.quantity})`).join(", ");
-      tr.innerHTML = `
-        <td>${order.customer || "Guest"}</td>
-        <td>${itemsList}</td>
-        <td>${order.total}</td>
-        <td>
-          <span class="status ${order.status}">${order.status}</span>
-          <div class="progress-container">
-            <div class="progress" id="progress-${index}"></div>
-            <div class="step" style="left:0%">
-              <div class="circle" id="circle-${index}-0">1</div>
-              <div class="label">Processing</div>
-            </div>
-            <div class="step" style="left:50%">
-              <div class="circle" id="circle-${index}-1">2</div>
-              <div class="label">Shipped</div>
-            </div>
-            <div class="step" style="left:100%">
-              <div class="circle" id="circle-${index}-2">3</div>
-              <div class="label">Delivered</div>
-            </div>
-          </div>
-        </td>
-        <td>
-          <select id="status-${index}" onchange="updateStatus(${index})">
-            <option ${order.status==="Processing"?"selected":""}>Processing</option>
-            <option ${order.status==="Shipped"?"selected":""}>Shipped</option>
-            <option ${order.status==="Delivered"?"selected":""}>Delivered</option>
-          </select>
-          <button class="next-btn" onclick="advanceStep(${index})">Next Step</button>
-        </td>
-      `;
-      table.appendChild(tr);
-      updateProgressUI(index, order.statusStep);
-    });
-}
-
-// Update progress UI
-function updateProgressUI(orderIndex, step) {
-  const progressBar = document.getElementById(`progress-${orderIndex}`);
-  for (let i = 0; i <= 2; i++) {
-    const circle = document.getElementById(`circle-${orderIndex}-${i}`);
-    if (i <= step) circle.classList.add('active');
-    else circle.classList.remove('active');
+  if(!orders.length){
+    container.innerHTML = "<p>No orders yet.</p>";
+    return;
   }
-  progressBar.style.width = `${(step / 2) * 100}%`;
+
+  orders.forEach((order, index) => {
+    if(order.statusStep === undefined) order.statusStep = 0;
+    const div = document.createElement('div');
+    div.className = 'order-card';
+    div.innerHTML = `
+      <p><b>${order.name}</b> - Status: ${["Processing","Shipped","Delivered"][order.statusStep]}</p>
+      <button onclick="nextStep(${index})">Next Step</button>
+    `;
+    container.appendChild(div);
+  });
 }
 
-// Update single order from dropdown
-function updateStatus(index) {
-  const newStatus = document.getElementById(`status-${index}`).value;
-  ordersData[index].status = newStatus;
-  ordersData[index].statusStep = newStatus === "Processing" ? 0 : newStatus === "Shipped" ? 1 : 2;
-  localStorage.setItem('pastOrders', JSON.stringify(ordersData));
-  renderOrdersTable();
+function nextStep(orderIndex){
+  let orders = JSON.parse(localStorage.getItem('pastOrders') || '[]');
+  if(orders[orderIndex].statusStep < 2){
+    orders[orderIndex].statusStep++;
+    localStorage.setItem('pastOrders', JSON.stringify(orders));
+  }
+  loadOrdersForAdmin();
 }
 
-// Advance step manually
-function advanceStep(index) {
-  let step = ordersData[index].statusStep || 0;
-  if (step >= 2) return;
-  step++;
-  ordersData[index].statusStep = step;
-  ordersData[index].status = step === 1 ? "Shipped" : "Delivered";
-  localStorage.setItem('pastOrders', JSON.stringify(ordersData));
-  renderOrdersTable();
-}
-
-// Search & filter
-document.getElementById("searchInput").addEventListener("input", renderOrdersTable);
-document.getElementById("statusFilter").addEventListener("change", renderOrdersTable);
-
-// Real-time auto-refresh across tabs
-window.addEventListener('storage', () => {
-  ordersData = JSON.parse(localStorage.getItem('pastOrders') || '[]');
-  renderOrdersTable();
-});
-
-// Initial render
-renderOrdersTable();
+// Initial load
+loadOrdersForAdmin();
 </script>
 
 </body>
 </html>
-
