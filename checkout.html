@@ -4,161 +4,48 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Xander | Checkout</title>
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
 <style>
-* { margin:0; padding:0; box-sizing:border-box; font-family:'Poppins', sans-serif; }
-
-body {
-  color: #fff;
-  background: linear-gradient(270deg, #ff758c, #ff7eb3, #9face6);
-  background-size: 600% 600%;
-  animation: gradientBG 15s ease infinite;
-}
-
-@keyframes gradientBG {
-  0% { background-position:0% 50%; }
-  50% { background-position:100% 50%; }
-  100% { background-position:0% 50%; }
-}
-
-header {
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  padding:15px 40px;
-  background: rgba(0,0,0,0.4);
-  backdrop-filter: blur(10px);
-  position: sticky;
-  top:0;
-  z-index:1000;
-}
-
-header h1 { font-size:1.8rem; font-weight:700; }
-nav a { margin:0 15px; text-decoration:none; color:#fff; font-weight:500; }
-.profile-btn {
-  background:#fff;
-  color:#333;
-  border-radius:10px;
-  width:40px;
-  height:40px;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  font-weight:bold;
-  cursor:pointer;
-  box-shadow:0 4px 8px rgba(0,0,0,0.2);
-}
-
-main { padding:50px 20px; max-width:900px; margin:0 auto; }
-
-h2 { margin-bottom:20px; font-size:2rem; }
-.cart-item { display:flex; justify-content:space-between; align-items:center; background:rgba(255,255,255,0.2); padding:15px; border-radius:10px; margin-bottom:10px; }
-.cart-item button { padding:5px 10px; border:none; border-radius:5px; cursor:pointer; }
-.cart-item button.update { background:orange; color:white; margin-right:5px; }
-.cart-item button.remove { background:red; color:white; }
-
-#total { font-weight:bold; font-size:1.2rem; margin-top:20px; }
-
-button#checkoutBtn { margin-top:30px; padding:12px 25px; font-size:1rem; font-weight:600; background:#fff; color:#333; border:none; border-radius:25px; cursor:pointer; transition:0.3s; }
-button#checkoutBtn:hover { background:#ffdfdf; transform:scale(1.05); }
-
+body { font-family: 'Poppins', sans-serif; padding: 30px; background: #f5f5f5; }
+button { padding: 10px 20px; background: #4caf50; color: white; border: none; border-radius: 5px; cursor:pointer; }
 </style>
 </head>
 <body>
 
-<header>
-  <h1>Xander</h1>
-  <nav>
-    <a href="index.html">Home</a>
-    <a href="shopping.html">Shop</a>
-    <a href="cart.html">Cart</a>
-    <a href="profile.html">Profile</a>
-  </nav>
-  <div style="display:flex;align-items:center;gap:10px;">
-    <span id="cartCount">🛒 0</span>
-    <div class="profile-btn" onclick="window.location.href='profile.html'">U</div>
-  </div>
-</header>
-
-<main>
-  <h2>Checkout</h2>
-  <div id="checkoutContainer"></div>
-  <div id="total">Total: $0</div>
-  <button id="checkoutBtn">Proceed to Payment</button>
-</main>
+<h2>Checkout</h2>
+<p>Total: $<span id="totalPrice">100</span></p>
+<button id="placeOrderBtn">Place Order</button>
 
 <script>
-// Load profile initial
-function loadProfileInitial() {
-  const name = localStorage.getItem('username') || 'U';
-  document.querySelector('.profile-btn').textContent = name.charAt(0).toUpperCase();
+// Example total (replace with your cart total logic)
+const totalPrice = 100;
+document.getElementById('totalPrice').textContent = totalPrice;
+
+// Make sure currentUser is set
+if (!localStorage.getItem('currentUser')) {
+  localStorage.setItem('currentUser', 'Sithum'); // Example user
 }
 
-// Update cart count
-function updateCartCount() {
-  const cart = JSON.parse(localStorage.getItem('cart') || '[]');
-  document.getElementById('cartCount').textContent = `🛒 ${cart.length}`;
-}
+document.getElementById('placeOrderBtn').addEventListener('click', () => {
+  const currentUser = localStorage.getItem('currentUser');
 
-// Render checkout items
-function renderCheckout() {
-  const container = document.getElementById('checkoutContainer');
-  const cart = JSON.parse(localStorage.getItem('cart') || '[]');
-  container.innerHTML = "";
-  if(cart.length === 0){
-    container.innerHTML = "<p>Your cart is empty.</p>";
-    document.getElementById('total').textContent = "Total: $0";
-    return;
-  }
-  let total = 0;
-  cart.forEach((item,index)=>{
-    total += item.price * (item.quantity || 1);
-    container.innerHTML += `
-      <div class="cart-item">
-        <span>${item.name} (x${item.quantity || 1}) - $${item.price}</span>
-        <div>
-          <button class="update" onclick="updateCart(${index})">Update</button>
-          <button class="remove" onclick="removeCart(${index})">Remove</button>
-        </div>
-      </div>`;
-  });
-  document.getElementById('total').textContent = `Total: $${total}`;
-}
+  // Get existing orders
+  let allOrders = JSON.parse(localStorage.getItem('allOrders') || '[]');
 
-// Cart item functions
-function removeCart(index){
-  let cart = JSON.parse(localStorage.getItem('cart') || '[]');
-  cart.splice(index,1);
-  localStorage.setItem('cart',JSON.stringify(cart));
-  updateCartCount();
-  renderCheckout();
-}
+  // Add new order
+  const newOrder = {
+    customer: currentUser,
+    total: totalPrice,
+    status: 'Processing',
+    statusStep: 0,
+    timestamp: new Date().toISOString()
+  };
+  allOrders.push(newOrder);
 
-function updateCart(index){
-  let cart = JSON.parse(localStorage.getItem('cart') || '[]');
-  const newQty = parseInt(prompt("Enter new quantity:", cart[index].quantity || 1));
-  if(newQty > 0){
-    cart[index].quantity = newQty;
-    localStorage.setItem('cart',JSON.stringify(cart));
-    renderCheckout();
-    updateCartCount();
-  }
-}
+  // Save back to localStorage
+  localStorage.setItem('allOrders', JSON.stringify(allOrders));
 
-// Proceed to payment
-document.getElementById('checkoutBtn').addEventListener('click',()=>{
-  const cart = JSON.parse(localStorage.getItem('cart') || '[]');
-  if(cart.length === 0){
-    alert("Cart is empty!");
-    return;
-  }
-  window.location.href = "gateway.html";
+  alert('Order placed successfully!');
 });
-
-// Initialize
-loadProfileInitial();
-updateCartCount();
-renderCheckout();
 </script>
 
 </body>
