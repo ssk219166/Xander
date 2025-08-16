@@ -4,90 +4,63 @@
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>Payment | Xander</title>
-<script type="module" src="firebase-config.js"></script>
 <style>
-body{font-family:'Poppins',sans-serif; background:#f0f0f0; padding:0; margin:0;}
-header{display:flex; justify-content:space-between; align-items:center; padding:15px 40px; background:#0072ff; color:#fff;}
-header a{color:#fff; margin:0 10px; text-decoration:none;}
-main{max-width:600px; margin:30px auto; background:#fff; padding:20px; border-radius:12px; box-shadow:0 5px 15px rgba(0,0,0,0.2);}
-.payment-option{padding:12px; margin:10px 0; border:1px solid #ccc; border-radius:10px; cursor:pointer; display:flex; justify-content:space-between; transition:0.3s;}
-.payment-option.selected{border:2px solid #0072ff; background:#e0f0ff;}
-button.pay-now{width:100%; padding:12px; margin-top:20px; background:#0072ff; color:#fff; border:none; border-radius:10px; cursor:pointer;}
-#confirmation{display:none; text-align:center; margin-top:20px; padding:15px; background:#e0ffe0; border-radius:10px;}
+body{font-family:'Poppins',sans-serif;background:#f0f0f0;margin:0;padding:0;}
+header{display:flex;justify-content:space-between;padding:15px;background:#0072ff;color:#fff;}
+header a{color:#fff;margin:0 10px;text-decoration:none;}
+main{max-width:700px;margin:30px auto;padding:20px;background:#fff;border-radius:12px;}
+.payment-option{background:#fff;color:#333;padding:12px;border-radius:10px;margin:10px 0;cursor:pointer;display:flex;justify-content:space-between; transition:0.3s;}
+.payment-option:hover{background:#ffdfdf;}
+.payment-option.selected{border:2px solid #0072ff;}
+button.pay-now{width:100%;padding:15px;border:none;border-radius:25px;background:#0072ff;color:#fff;font-weight:600;margin-top:20px;}
+button.pay-now:hover{background:#005bb5;}
+#confirmation{margin-top:20px;text-align:center;display:none;background:#f0f0f0;padding:15px;border-radius:10px;}
 </style>
 </head>
 <body>
 <header>
-<h1>Xander Payment</h1>
+<h1>Payment</h1>
 <nav>
-  <a href="index.html">Home</a>
-  <a href="shop.html">Shop</a>
-  <a href="cart.html">Cart</a>
-  <a href="profile.html">Profile</a>
+<a href="index.html">Home</a>
+<a href="shop.html">Shop</a>
+<a href="cart.html">Cart</a>
+<a href="yourprofile.html">Profile</a>
 </nav>
-<div id="cart-count">🛒 0</div>
 </header>
 
 <main>
-<h2>Select Payment Method</h2>
+<h2>Choose Payment Method</h2>
 <div class="payment-option" onclick="selectPayment(this,'PayPal')">PayPal 💳</div>
-<div class="payment-option" onclick="selectPayment(this,'Debit/Credit Card')">Debit/Credit Card 💳</div>
-<div class="payment-option" onclick="selectPayment(this,'COD')">Cash on Delivery 💵</div>
+<div class="payment-option" onclick="selectPayment(this,'Debit/Credit')">Debit/Credit Card 💳</div>
+<div class="payment-option" onclick="selectPayment(this,'COD')">Cash on Delivery 💰</div>
 
 <button class="pay-now" onclick="payNow()">Pay Now</button>
 
 <div id="confirmation">
-  <h3>Payment Successful!</h3>
-  <p>Your order has been placed.</p>
-  <button onclick="window.location.href='trackorder.html'">Track My Orders</button>
+<h3>Payment Successful!</h3>
+<p>Your order has been placed.</p>
+<button onclick="window.location.href='trackorder.html'">View My Orders</button>
 </div>
 </main>
 
-<script type="module">
-import { auth, db } from './firebase-config.js';
-import { collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
-import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
-
+<script>
 let selectedPayment=null;
 function selectPayment(el,method){
   selectedPayment=method;
-  document.querySelectorAll('.payment-option').forEach(x=>x.classList.remove('selected'));
+  document.querySelectorAll('.payment-option').forEach(item=>item.classList.remove('selected'));
   el.classList.add('selected');
 }
 
-function updateCartCount(){
-  const cart = JSON.parse(localStorage.getItem('cart')||'[]');
-  document.getElementById('cart-count').textContent=`🛒 ${cart.length}`;
-}
-updateCartCount();
-
-window.payNow=async function(){
-  if(!selectedPayment){ alert('Select payment!'); return; }
-  const cart = JSON.parse(localStorage.getItem('cart')||'[]');
-  if(!cart.length){ alert('Cart is empty!'); return; }
-
-  onAuthStateChanged(auth,async user=>{
-    if(user){
-      try{
-        for(const item of cart){
-          await addDoc(collection(db,'orders'),{
-            userId:user.uid,
-            username:user.displayName,
-            email:user.email,
-            product:item.name,
-            price:item.price,
-            quantity:item.quantity,
-            paymentMethod:selectedPayment,
-            status:'Processing',
-            timestamp:serverTimestamp()
-          });
-        }
-        localStorage.setItem('cart','[]');
-        updateCartCount();
-        document.getElementById('confirmation').style.display='block';
-      }catch(err){ alert(err.message); }
-    } else { alert('Please login!'); window.location.href='signin.html'; }
-  });
+function payNow(){
+  if(!selectedPayment){ alert('Select payment method'); return; }
+  const cart=JSON.parse(localStorage.getItem('cart')||'[]');
+  if(!cart.length){ alert('Cart empty'); return; }
+  let pastOrders=JSON.parse(localStorage.getItem('pastOrders')||'[]');
+  cart.forEach(item=>{ item.paymentMethod=selectedPayment; item.status='Processing'; });
+  pastOrders=pastOrders.concat(cart);
+  localStorage.setItem('pastOrders',JSON.stringify(pastOrders));
+  localStorage.setItem('cart',JSON.stringify([]));
+  document.getElementById('confirmation').style.display='block';
 }
 </script>
 </body>
