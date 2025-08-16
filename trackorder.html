@@ -4,110 +4,26 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Xander | Track Orders</title>
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
 <style>
 * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; }
-body {
-  background: linear-gradient(270deg, #ff758c, #ff7eb3, #9face6);
-  background-size: 600% 600%;
-  animation: gradientBG 15s ease infinite;
-  color: #333;
-  min-height: 100vh;
-}
-@keyframes gradientBG {
-  0% { background-position: 0% 50% }
-  50% { background-position: 100% 50% }
-  100% { background-position: 0% 50% }
-}
-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 15px 40px;
-  background: rgba(0,0,0,0.4);
-  backdrop-filter: blur(10px);
-  position: sticky;
-  top: 0;
-  z-index: 1000;
-  color: white;
-}
-header h1 { font-size: 1.8rem; font-weight: 700; }
-nav a {
-  margin: 0 15px; text-decoration: none; color: #fff; font-weight: 500; position: relative;
-}
-nav a::after {
-  content: ''; position: absolute; width: 0; height: 2px; bottom: -5px; left: 0;
-  background: #fff; transition: width 0.3s;
-}
-nav a:hover::after { width: 100%; }
-main {
-  padding: 30px; max-width: 900px; margin: auto;
-}
-h2 {
-  text-align: center;
-  margin-bottom: 30px;
-  color: white;
-}
-.order-card {
-  background: rgba(255,255,255,0.9);
-  border-radius: 15px;
-  padding: 20px;
-  margin-bottom: 25px;
-  box-shadow: 0 6px 15px rgba(0,0,0,0.2);
-}
-.order-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 15px;
-}
-.order-header h3 {
-  font-size: 1.2rem;
-  color: #333;
-}
-.progress-container {
-  position: relative;
-  height: 6px;
-  background: #ddd;
-  border-radius: 3px;
-  margin: 20px 0;
-}
-.progress {
-  height: 6px;
-  background: linear-gradient(90deg, #4caf50, #2ecc71);
-  border-radius: 3px;
-  width: 0;
-  transition: width 1s ease-in-out;
-}
-.step {
-  position: absolute;
-  top: -20px;
-  transform: translateX(-50%);
-  text-align: center;
-  width: 80px;
-}
-.step .circle {
-  width: 24px;
-  height: 24px;
-  border-radius: 50%;
-  background: #bbb;
-  color: white;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin: 0 auto 5px;
-  font-size: 12px;
-  transition: background 0.5s ease-in-out, transform 0.3s;
-}
-.step.active .circle {
-  background: #4caf50;
-  transform: scale(1.1);
-  box-shadow: 0 0 10px rgba(76,175,80,0.8);
-}
-.step .label {
-  font-size: 12px;
-  color: #555;
-}
+body { background: linear-gradient(270deg, #ff758c, #ff7eb3, #9face6); background-size:600% 600%; animation:gradientBG 15s ease infinite; color:#333; min-height:100vh; }
+@keyframes gradientBG { 0%{background-position:0% 50%} 50%{background-position:100% 50%} 100%{background-position:0% 50%} }
+header { display:flex; justify-content:space-between; align-items:center; padding:15px 40px; background:rgba(0,0,0,0.4); backdrop-filter:blur(10px); position:sticky; top:0; z-index:1000; color:white; }
+header h1 { font-size:1.8rem; font-weight:700; }
+nav a { margin:0 15px; text-decoration:none; color:#fff; font-weight:500; position:relative; }
+nav a::after { content:''; position:absolute; width:0; height:2px; bottom:-5px; left:0; background:#fff; transition: width 0.3s; }
+nav a:hover::after { width:100%; }
+main { padding:30px; max-width:900px; margin:auto; }
+h2 { text-align:center; margin-bottom:30px; color:white; }
+.order-card { background:rgba(255,255,255,0.9); border-radius:15px; padding:20px; margin-bottom:25px; box-shadow:0 6px 15px rgba(0,0,0,0.2); }
+.order-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:15px; }
+.order-header h3 { font-size:1.2rem; color:#333; }
+.progress-container { position:relative; height:6px; background:#ddd; border-radius:3px; margin:20px 0; }
+.progress { height:6px; background:linear-gradient(90deg,#4caf50,#2ecc71); border-radius:3px; width:0; transition: width 1s ease-in-out; }
+.step { position:absolute; top:-20px; transform:translateX(-50%); text-align:center; width:80px; }
+.step .circle { width:24px; height:24px; border-radius:50%; background:#bbb; color:white; display:flex; align-items:center; justify-content:center; margin:0 auto 5px; font-size:12px; transition:background 0.5s ease-in-out, transform 0.3s; }
+.step.active .circle { background:#4caf50; transform:scale(1.1); box-shadow:0 0 10px rgba(76,175,80,0.8); }
+.step .label { font-size:12px; color:#555; }
 </style>
 </head>
 <body>
@@ -129,77 +45,46 @@ h2 {
 
 <script>
 function loadOrders() {
-  let orders = JSON.parse(localStorage.getItem('pastOrders') || '[]');
+  const orders = JSON.parse(localStorage.getItem('pastOrders') || '[]');
+  renderOrders(orders);
+}
+
+function renderOrders(orders) {
   const container = document.getElementById('ordersContainer');
   container.innerHTML = '';
-
   if (!orders.length) {
     container.innerHTML = "<p style='color:white; text-align:center;'>No orders yet.</p>";
     return;
   }
 
-  orders.forEach((order, index) => {
-    if (order.statusStep === undefined) order.statusStep = 0; // default
+  orders.forEach(order => {
     const div = document.createElement('div');
     div.className = 'order-card';
     div.innerHTML = `
       <div class="order-header">
-        <h3>${order.name} - $${order.price} (x${order.quantity || 1})</h3>
-        <span>Status: <b id="status-${index}">Processing</b></span>
+        <h3>${order.customer || 'Guest'} - $${order.total}</h3>
+        <span>Status: <b>${order.status}</b></span>
       </div>
       <div class="progress-container">
-        <div class="progress" id="progress-${index}"></div>
-        <div class="step" style="left:0%">
-          <div class="circle" id="circle-${index}-0">1</div>
-          <div class="label">Processing</div>
-        </div>
-        <div class="step" style="left:50%">
-          <div class="circle" id="circle-${index}-1">2</div>
-          <div class="label">Shipped</div>
-        </div>
-        <div class="step" style="left:100%">
-          <div class="circle" id="circle-${index}-2">3</div>
-          <div class="label">Delivered</div>
-        </div>
+        <div class="progress"></div>
+        <div class="step" style="left:0%"><div class="circle ${order.statusStep>=0?'active':''}">1</div><div class="label">Processing</div></div>
+        <div class="step" style="left:50%"><div class="circle ${order.statusStep>=1?'active':''}">2</div><div class="label">Shipped</div></div>
+        <div class="step" style="left:100%"><div class="circle ${order.statusStep>=2?'active':''}">3</div><div class="label">Delivered</div></div>
       </div>
     `;
     container.appendChild(div);
-    updateUI(index, order.statusStep);
-    simulateProgress(index, order.statusStep);
+
+    // Update progress bar width
+    const progressBar = div.querySelector('.progress');
+    progressBar.style.width = `${(order.statusStep/2)*100}%`;
   });
-
-  localStorage.setItem('pastOrders', JSON.stringify(orders));
 }
 
-function updateUI(orderIndex, step) {
-  const steps = ["Processing", "Shipped", "Delivered"];
-  const progressBar = document.getElementById(`progress-${orderIndex}`);
-  const statusLabel = document.getElementById(`status-${orderIndex}`);
+// Update in real-time if localStorage changes (admin updates)
+window.addEventListener('storage', loadOrders);
 
-  statusLabel.textContent = steps[step] || "Processing";
-  for (let i = 0; i <= step; i++) {
-    document.getElementById(`circle-${orderIndex}-${i}`).classList.add('active');
-  }
-  progressBar.style.width = `${(step / 2) * 100}%`;
-}
-
-function simulateProgress(orderIndex, currentStep) {
-  let orders = JSON.parse(localStorage.getItem('pastOrders') || '[]');
-  let step = currentStep;
-
-  function nextStep() {
-    if (step >= 2) return;
-    step++;
-    orders[orderIndex].statusStep = step;
-    localStorage.setItem('pastOrders', JSON.stringify(orders));
-    updateUI(orderIndex, step);
-    if (step < 2) setTimeout(nextStep, 4000);
-  }
-
-  if (step < 2) setTimeout(nextStep, 4000);
-}
-
-loadOrders();
+// Initial load
+window.addEventListener('load', loadOrders);
 </script>
 
 </body>
