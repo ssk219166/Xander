@@ -1,12 +1,12 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Xander | Shop</title>
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Shop | Xander</title>
+<script type="module" src="firebase-config.js"></script>
 <style>
-* { margin:0; padding:0; box-sizing:border-box; font-family:'Poppins', sans-serif; }
+    * { margin:0; padding:0; box-sizing:border-box; font-family:'Poppins', sans-serif; }
 
 body {
   color: #fff;
@@ -94,32 +94,31 @@ h2 { text-align:center; margin-bottom:30px; font-size:2.5rem; }
   margin-bottom:10px;
   text-align:center;
 }
-
 </style>
 </head>
 <body>
-
 <header>
-  <h1>Xander</h1>
-  <nav>
-    <a href="index.html">Home</a>
-    <a href="shopping.html">Shop</a>
-    <a href="cart.html">Cart</a>
-    <a href="profile.html">Profile</a>
-  </nav>
-  <div style="display:flex;align-items:center;gap:10px;">
-    <span id="cartCount">🛒 0</span>
-    <div class="profile-btn" onclick="window.location.href='yourprofile.html'">U</div>
-  </div>
+<h1>Xander</h1>
+<nav>
+  <a href="index.html">Home</a>
+  <a href="shop.html">Shop</a>
+  <a href="cart.html">Cart</a>
+  <a href="profile.html">Profile</a>
+</nav>
+<div style="display:flex;align-items:center;gap:10px;">
+  <span id="cart-count">🛒 0</span>
+  <div class="profile-btn" id="profileBtn">U</div>
+</div>
 </header>
 
 <main>
-  <h2>Shop Our Products</h2>
-  <div class="products" id="productContainer"></div>
+<section class="products" id="productsGrid"></section>
 </main>
 
-<script>
-// Sample products array
+<script type="module">
+import { auth } from './firebase-config.js';
+import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
+
 const products = [
   { name:"Stylish T-Shirt", price:20, img:"https://via.placeholder.com/300x300?text=T-Shirt" },
   { name:"Wireless Headphones", price:50, img:"https://via.placeholder.com/300x300?text=Headphones" },
@@ -129,58 +128,48 @@ const products = [
   { name:"USB Cables", price:10, img:"https://via.placeholder.com/300x300?text=Cables" }
 ];
 
-// Load profile initial
-function loadProfileInitial() {
-  const name = localStorage.getItem('username') || 'U';
-  document.querySelector('.profile-btn').textContent = name.charAt(0).toUpperCase();
-}
-
-// Update cart count
-function updateCartCount() {
-  const cart = JSON.parse(localStorage.getItem('cart') || '[]');
-  document.getElementById('cartCount').textContent = `🛒 ${cart.length}`;
-}
-
 // Render products
-function renderProducts() {
-  const container = document.getElementById('productContainer');
-  container.innerHTML = "";
-  products.forEach((product,index)=>{
-    container.innerHTML += `
-      <div class="product-card">
-        <img src="${product.img}" alt="${product.name}">
-        <h3>${product.name}</h3>
-        <p>$${product.price}</p>
-        <input type="number" class="quantity-input" id="qty${index}" value="1" min="1">
-        <button onclick="addToCart(${index})">Add to Cart</button>
-      </div>`;
-  });
-}
+const grid = document.getElementById('productsGrid');
+products.forEach((p,i)=>{
+  const div=document.createElement('div');
+  div.className='product-card';
+  div.innerHTML=`
+    <img src="${p.img}" alt="${p.name}">
+    <h3>${p.name}</h3>
+    <p>$${p.price}</p>
+    <button onclick="addToCart(${i})">Add to Cart</button>
+  `;
+  grid.appendChild(div);
+});
 
-// Add to cart
-function addToCart(index){
-  const qty = parseInt(document.getElementById(`qty${index}`).value) || 1;
-  const cart = JSON.parse(localStorage.getItem('cart') || '[]');
-  const product = products[index];
-  
-  // Check if already in cart
-  const existing = cart.find(item => item.name === product.name);
-  if(existing){
-    existing.quantity = (existing.quantity || 1) + qty;
+// Cart & profile btn
+function updateCartCount(){
+  const cart = JSON.parse(localStorage.getItem('cart')||'[]');
+  document.getElementById('cart-count').textContent=`🛒 ${cart.length}`;
+}
+onAuthStateChanged(auth,user=>{
+  const profileBtn=document.getElementById('profileBtn');
+  if(user){
+    profileBtn.textContent=user.displayName?user.displayName.charAt(0).toUpperCase():'U';
+    profileBtn.onclick=()=>window.location.href='profile.html';
   } else {
-    cart.push({ name: product.name, price: product.price, quantity: qty });
+    profileBtn.textContent='U';
+    profileBtn.onclick=()=>window.location.href='signin.html';
   }
-  
-  localStorage.setItem('cart', JSON.stringify(cart));
-  updateCartCount();
-  alert(`${product.name} added to cart!`);
-}
-
-// Initialize
-loadProfileInitial();
+});
 updateCartCount();
-renderProducts();
-</script>
 
+window.addToCart=function(i){
+  const cart = JSON.parse(localStorage.getItem('cart')||'[]');
+  const product = products[i];
+  // add quantity
+  const existing = cart.find(c=>c.name===product.name);
+  if(existing){ existing.quantity=(existing.quantity||1)+1; }
+  else{ product.quantity=1; cart.push(product); }
+  localStorage.setItem('cart',JSON.stringify(cart));
+  updateCartCount();
+  alert(`${product.name} added to cart`);
+}
+</script>
 </body>
 </html>
