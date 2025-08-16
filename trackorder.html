@@ -1,76 +1,114 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Xander | Track My Orders</title>
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
-  <style>
-    * { margin:0; padding:0; box-sizing:border-box; font-family:'Poppins',sans-serif; }
-    body {
-      background:linear-gradient(270deg,#ff758c,#ff7eb3,#9face6);
-      background-size:600% 600%; animation:gradientBG 15s ease infinite;
-      color:#fff; min-height:100vh;
-    }
-    @keyframes gradientBG { 0%{background-position:0% 50%} 50%{background-position:100% 50%} 100%{background-position:0% 50%} }
-
-    header {
-      display:flex; justify-content:space-between; align-items:center;
-      padding:15px 40px; background: rgba(0,0,0,0.4); backdrop-filter: blur(10px);
-      position: sticky; top:0; z-index:1000;
-    }
-    header h1 { font-size:1.8rem; font-weight:700; }
-    nav a { margin:0 15px; text-decoration:none; color:#fff; font-weight:500; position:relative; }
-    nav a::after { content:''; position:absolute; width:0; height:2px; bottom:-5px; left:0; background:#fff; transition:width 0.3s; }
-    nav a:hover::after { width:100%; }
-    .profile-btn { background:#fff; color:#333; border-radius:10px; width:40px; height:40px;
-      display:flex; align-items:center; justify-content:center; font-weight:bold;
-      cursor:pointer; box-shadow:0 4px 8px rgba(0,0,0,0.2); transition:transform 0.3s; }
-    .profile-btn:hover { transform:scale(1.1); }
-
-    main {
-      padding:30px; max-width:900px; margin:auto;
-    }
-    h2 { margin-bottom:20px; text-align:center; }
-
-    .order-card {
-      background:rgba(255,255,255,0.1); padding:20px; border-radius:15px;
-      margin-bottom:20px; box-shadow:0 6px 12px rgba(0,0,0,0.2);
-    }
-    .order-card h3 { margin-bottom:10px; font-size:1.2rem; }
-    .order-card p { margin-bottom:15px; }
-
-    /* Progress bar timeline */
-    .progress-container {
-      display:flex; justify-content:space-between; position:relative; margin:20px 0;
-    }
-    .progress-container::before {
-      content:''; position:absolute; top:50%; left:0; right:0;
-      height:6px; background:#ddd; border-radius:5px; transform:translateY(-50%);
-    }
-    .progress {
-      position:absolute; top:50%; left:0; height:6px; background:#4caf50;
-      border-radius:5px; transform:translateY(-50%);
-      transition:width 0.5s;
-    }
-    .step {
-      z-index:1; position:relative; text-align:center; flex:1;
-    }
-    .circle {
-      width:30px; height:30px; border-radius:50%; background:#ddd; margin:0 auto;
-      display:flex; align-items:center; justify-content:center; font-size:14px; font-weight:bold;
-      transition:0.3s;
-    }
-    .step.active .circle { background:#4caf50; color:#fff; }
-    .label { margin-top:5px; font-size:0.85rem; }
-
-    .delete-btn {
-      margin-top:10px; padding:8px 15px; border:none; border-radius:8px;
-      background:red; color:#fff; font-weight:600; cursor:pointer;
-      transition:0.3s;
-    }
-    .delete-btn:hover { background:darkred; }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Xander | Track Orders</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; }
+body {
+  background: linear-gradient(270deg, #ff758c, #ff7eb3, #9face6);
+  background-size: 600% 600%;
+  animation: gradientBG 15s ease infinite;
+  color: #333;
+  min-height: 100vh;
+}
+@keyframes gradientBG {
+  0% { background-position: 0% 50% }
+  50% { background-position: 100% 50% }
+  100% { background-position: 0% 50% }
+}
+header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px 40px;
+  background: rgba(0,0,0,0.4);
+  backdrop-filter: blur(10px);
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  color: white;
+}
+header h1 { font-size: 1.8rem; font-weight: 700; }
+nav a {
+  margin: 0 15px; text-decoration: none; color: #fff; font-weight: 500; position: relative;
+}
+nav a::after {
+  content: ''; position: absolute; width: 0; height: 2px; bottom: -5px; left: 0;
+  background: #fff; transition: width 0.3s;
+}
+nav a:hover::after { width: 100%; }
+main {
+  padding: 30px; max-width: 900px; margin: auto;
+}
+h2 {
+  text-align: center;
+  margin-bottom: 30px;
+  color: white;
+}
+.order-card {
+  background: rgba(255,255,255,0.9);
+  border-radius: 15px;
+  padding: 20px;
+  margin-bottom: 25px;
+  box-shadow: 0 6px 15px rgba(0,0,0,0.2);
+}
+.order-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+}
+.order-header h3 {
+  font-size: 1.2rem;
+  color: #333;
+}
+.progress-container {
+  position: relative;
+  height: 6px;
+  background: #ddd;
+  border-radius: 3px;
+  margin: 20px 0;
+}
+.progress {
+  height: 6px;
+  background: linear-gradient(90deg, #4caf50, #2ecc71);
+  border-radius: 3px;
+  width: 0;
+  transition: width 1s ease-in-out;
+}
+.step {
+  position: absolute;
+  top: -20px;
+  transform: translateX(-50%);
+  text-align: center;
+  width: 80px;
+}
+.step .circle {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: #bbb;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 5px;
+  font-size: 12px;
+  transition: background 0.5s ease-in-out, transform 0.3s;
+}
+.step.active .circle {
+  background: #4caf50;
+  transform: scale(1.1);
+  box-shadow: 0 0 10px rgba(76,175,80,0.8);
+}
+.step .label {
+  font-size: 12px;
+  color: #555;
+}
+</style>
 </head>
 <body>
 
@@ -78,14 +116,10 @@
   <h1>Xander</h1>
   <nav>
     <a href="index.html">Home</a>
-    <a href="shop.html">Shop</a>
+    <a href="shopping.html">Shop</a>
     <a href="cart.html">Cart</a>
     <a href="profile.html">Profile</a>
   </nav>
-  <div style="display:flex;align-items:center;gap:10px;">
-    <span id="cart-count">🛒 0</span>
-    <div class="profile-btn" onclick="window.location.href='profile.html'">U</div>
-  </div>
 </header>
 
 <main>
@@ -94,77 +128,65 @@
 </main>
 
 <script>
-// Profile + Cart
-function loadProfileInitial() {
-  const name = localStorage.getItem('username') || 'U';
-  document.querySelector('.profile-btn').textContent = name.charAt(0).toUpperCase();
-}
-function updateCartCount() {
-  const cart = JSON.parse(localStorage.getItem('cart') || '[]');
-  document.getElementById('cart-count').textContent = `🛒 ${cart.length}`;
-}
-loadProfileInitial();
-updateCartCount();
-
-// Load Orders
 function loadOrders() {
   const orders = JSON.parse(localStorage.getItem('pastOrders') || '[]');
   const container = document.getElementById('ordersContainer');
   container.innerHTML = '';
 
-  if(!orders.length) {
-    container.innerHTML = "<p>No orders found.</p>";
+  if (!orders.length) {
+    container.innerHTML = "<p style='color:white; text-align:center;'>No orders yet.</p>";
     return;
   }
 
   orders.forEach((order, index) => {
-    // Assign random status if not already set
-    if(!order.status) {
-      const statuses = ["Processing","Shipped","Delivered"];
-      order.status = statuses[Math.floor(Math.random()*statuses.length)];
-    }
-
-    // Progress bar calculation
-    let progressPercent = 0;
-    if(order.status === "Processing") progressPercent = 0;
-    if(order.status === "Shipped") progressPercent = 50;
-    if(order.status === "Delivered") progressPercent = 100;
-
     const div = document.createElement('div');
     div.className = 'order-card';
     div.innerHTML = `
-      <h3>${order.name}</h3>
-      <p>Price: $${order.price} | Quantity: ${order.quantity || 1}</p>
+      <div class="order-header">
+        <h3>${order.name} - $${order.price} (x${order.quantity || 1})</h3>
+        <span>Status: <b id="status-${index}">Processing</b></span>
+      </div>
       <div class="progress-container">
-        <div class="progress" style="width:${progressPercent}%;"></div>
-        <div class="step ${order.status==='Processing' || order.status==='Shipped' || order.status==='Delivered' ? 'active':''}">
-          <div class="circle">1</div>
+        <div class="progress" id="progress-${index}"></div>
+        <div class="step" style="left:0%">
+          <div class="circle" id="circle-${index}-0">1</div>
           <div class="label">Processing</div>
         </div>
-        <div class="step ${order.status==='Shipped' || order.status==='Delivered' ? 'active':''}">
-          <div class="circle">2</div>
+        <div class="step" style="left:50%">
+          <div class="circle" id="circle-${index}-1">2</div>
           <div class="label">Shipped</div>
         </div>
-        <div class="step ${order.status==='Delivered' ? 'active':''}">
-          <div class="circle">3</div>
+        <div class="step" style="left:100%">
+          <div class="circle" id="circle-${index}-2">3</div>
           <div class="label">Delivered</div>
         </div>
       </div>
-      <button class="delete-btn" onclick="deleteOrder(${index})">Remove Order</button>
     `;
     container.appendChild(div);
+    simulateProgress(index);
   });
-
-  localStorage.setItem('pastOrders', JSON.stringify(orders)); // Save status updates
 }
 
-function deleteOrder(index){
-  let orders = JSON.parse(localStorage.getItem('pastOrders') || '[]');
-  orders.splice(index,1);
-  localStorage.setItem('pastOrders', JSON.stringify(orders));
-  loadOrders();
+function simulateProgress(orderIndex) {
+  let step = 0;
+  const steps = ["Processing", "Shipped", "Delivered"];
+  const progressBar = document.getElementById(`progress-${orderIndex}`);
+  const statusLabel = document.getElementById(`status-${orderIndex}`);
+
+  function updateStep() {
+    if (step > 2) return;
+    statusLabel.textContent = steps[step];
+    for (let i = 0; i <= step; i++) {
+      document.getElementById(`circle-${orderIndex}-${i}`).classList.add('active');
+    }
+    progressBar.style.width = `${(step / 2) * 100}%`;
+    step++;
+    if (step <= 2) setTimeout(updateStep, 4000); // 4s between updates
+  }
+  updateStep();
 }
 
+// Load orders on page start
 loadOrders();
 </script>
 
