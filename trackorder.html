@@ -65,7 +65,7 @@ function renderOrders(orders) {
     div.className = 'order-card';
     div.innerHTML = `
       <div class="order-header">
-        <h3>${order.customer} - $${order.total}</h3>
+        <h3>${order.item} - $${order.total}</h3>
         <span>Status: <b>${order.status}</b></span>
       </div>
       <div class="progress-container">
