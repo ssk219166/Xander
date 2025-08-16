@@ -126,6 +126,7 @@ function loadOrders() {
 
   orders.forEach((order, index) => {
     if (order.statusStep === undefined) order.statusStep = 0;
+
     const div = document.createElement('div');
     div.className = 'order-card';
     div.innerHTML = `
@@ -158,17 +159,34 @@ function updateUI(orderIndex, step) {
   const steps = ["Processing", "Shipped", "Delivered"];
   const progressBar = document.getElementById(`progress-${orderIndex}`);
   const statusLabel = document.getElementById(`status-${orderIndex}`);
-
   statusLabel.textContent = steps[step] || "Processing";
+
+  // Animate circles gradually
   for (let i = 0; i <= 2; i++) {
     const circle = document.getElementById(`circle-${orderIndex}-${i}`);
-    if (i <= step) circle.classList.add('active');
-    else circle.classList.remove('active');
+    if (i <= step) {
+      setTimeout(() => circle.classList.add('active'), i * 300); // staggered effect
+    } else {
+      circle.classList.remove('active');
+    }
   }
-  progressBar.style.width = `${(step / 2) * 100}%`;
+
+  // Smooth progress bar animation
+  const targetWidth = (step / 2) * 100;
+  let currentWidth = parseFloat(progressBar.style.width) || 0;
+  const stepsCount = 20;
+  const stepSize = (targetWidth - currentWidth) / stepsCount;
+  let counter = 0;
+
+  const animate = setInterval(() => {
+    currentWidth += stepSize;
+    progressBar.style.width = currentWidth + '%';
+    counter++;
+    if (counter >= stepsCount) clearInterval(animate);
+  }, 20);
 }
 
-// Real-time update when another tab/page updates localStorage
+// Update automatically when localStorage changes (e.g., admin updates)
 window.addEventListener('storage', function(event) {
   if (event.key === 'pastOrders') loadOrders();
 });
