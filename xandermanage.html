@@ -33,7 +33,6 @@
     <option value="Shipped">Shipped</option>
     <option value="Delivered">Delivered</option>
   </select>
-  <button onclick="updateAllStatuses()">Update All Orders</button>
 </div>
 
 <table>
@@ -50,9 +49,9 @@
 </table>
 
 <script>
+// Load orders from localStorage or create sample data
 let ordersData = JSON.parse(localStorage.getItem('pastOrders') || '[]');
 
-// Sample initial data if no orders exist
 if (!ordersData.length) {
   ordersData = [
     { customer: "Alice", items:[{name:"Phone", quantity:1}], total:500, status:"Processing", statusStep:0 },
@@ -61,11 +60,11 @@ if (!ordersData.length) {
   localStorage.setItem('pastOrders', JSON.stringify(ordersData));
 }
 
+// Render orders table
 function renderOrdersTable() {
   const table = document.getElementById("ordersTable");
   const searchValue = document.getElementById("searchInput").value.toLowerCase();
   const statusFilter = document.getElementById("statusFilter").value;
-
   table.innerHTML = "";
 
   ordersData
@@ -82,7 +81,7 @@ function renderOrdersTable() {
         <td>${order.total}</td>
         <td><span class="status ${order.status}">${order.status}</span></td>
         <td>
-          <select id="status-${index}">
+          <select id="status-${index}" onchange="updateStatus(${index})">
             <option ${order.status==="Processing"?"selected":""}>Processing</option>
             <option ${order.status==="Shipped"?"selected":""}>Shipped</option>
             <option ${order.status==="Delivered"?"selected":""}>Delivered</option>
@@ -93,21 +92,20 @@ function renderOrdersTable() {
     });
 }
 
-function updateAllStatuses() {
-  ordersData.forEach((order, index) => {
-    const newStatus = document.getElementById(`status-${index}`).value;
-    order.status = newStatus;
-    order.statusStep = newStatus === "Processing" ? 0 : newStatus === "Shipped" ? 1 : 2;
-  });
+// Update single order status manually
+function updateStatus(index) {
+  const newStatus = document.getElementById(`status-${index}`).value;
+  ordersData[index].status = newStatus;
+  ordersData[index].statusStep = newStatus === "Processing" ? 0 : newStatus === "Shipped" ? 1 : 2;
   localStorage.setItem('pastOrders', JSON.stringify(ordersData));
-  renderOrdersTable();
-  alert("All orders updated successfully!");
+  renderOrdersTable(); // refresh table
 }
 
 // Search and filter events
 document.getElementById("searchInput").addEventListener("input", renderOrdersTable);
 document.getElementById("statusFilter").addEventListener("change", renderOrdersTable);
 
+// Initial render
 renderOrdersTable();
 </script>
 
