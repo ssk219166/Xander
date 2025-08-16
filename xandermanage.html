@@ -8,24 +8,73 @@
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js"></script>
   <style>
     body {
-      font-family: Arial, sans-serif;
-      background: #f4f7fc;
-      margin: 0; padding: 20px;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: #f0f2f5;
+      margin: 0;
+      padding: 20px;
     }
-    h1 { text-align: center; color: #333; }
+    h1 {
+      text-align: center;
+      color: #1a1a1a;
+      margin-bottom: 20px;
+    }
+    .controls {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 15px;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+    .controls input, .controls select {
+      padding: 8px 10px;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+      font-size: 14px;
+    }
+    .controls button {
+      padding: 8px 15px;
+      border: none;
+      border-radius: 5px;
+      background: #4CAF50;
+      color: white;
+      cursor: pointer;
+      font-size: 14px;
+    }
+    .controls button:hover { background: #45a049; }
+
     table {
-      width: 100%; border-collapse: collapse; margin-top: 20px;
-      background: white; box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+      width: 100%;
+      border-collapse: collapse;
+      background: white;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
     }
     th, td {
-      padding: 12px; border-bottom: 1px solid #ddd; text-align: left;
+      padding: 12px;
+      border-bottom: 1px solid #ddd;
+      text-align: left;
+      font-size: 14px;
     }
-    th { background: #333; color: white; }
+    th {
+      background: #333;
+      color: white;
+      text-transform: uppercase;
+      font-weight: 600;
+    }
+    tr:hover { background: #f9f9f9; }
+
     select, button {
-      padding: 5px 10px; margin-left: 5px;
+      padding: 5px 10px;
+      margin-right: 5px;
+      font-size: 13px;
     }
+
     .status {
-      font-weight: bold; padding: 5px 10px; border-radius: 6px;
+      font-weight: bold;
+      padding: 5px 10px;
+      border-radius: 6px;
+      display: inline-block;
+      min-width: 80px;
+      text-align: center;
     }
     .Processing { background: orange; color: white; }
     .Shipped { background: dodgerblue; color: white; }
@@ -34,6 +83,18 @@
 </head>
 <body>
   <h1>📦 Xander Admin Dashboard</h1>
+
+  <div class="controls">
+    <input type="text" id="searchInput" placeholder="Search by customer...">
+    <select id="statusFilter">
+      <option value="">All Statuses</option>
+      <option value="Processing">Processing</option>
+      <option value="Shipped">Shipped</option>
+      <option value="Delivered">Delivered</option>
+    </select>
+    <button onclick="updateAllStatuses()">Update All Orders</button>
+  </div>
+
   <table>
     <thead>
       <tr>
@@ -48,7 +109,7 @@
   </table>
 
 <script>
-  // 🔹 Your Firebase config (replace with your project values)
+  // 🔹 Firebase config
   const firebaseConfig = {
     apiKey: "YOUR_API_KEY",
     authDomain: "YOUR_PROJECT.firebaseapp.com",
@@ -58,44 +119,68 @@
     appId: "APP_ID"
   };
 
-  // 🔹 Initialize Firebase
   const app = firebase.initializeApp(firebaseConfig);
   const db = firebase.firestore();
 
-  // 🔹 Listen for orders in realtime
-  db.collection("orders").onSnapshot(snapshot => {
+  let ordersData = []; // Keep all orders in memory
+
+  // 🔹 Render orders in table
+  function renderOrders() {
     const table = document.getElementById("ordersTable");
+    const searchValue = document.getElementById("searchInput").value.toLowerCase();
+    const statusFilter = document.getElementById("statusFilter").value;
+
     table.innerHTML = "";
-    snapshot.forEach(doc => {
-      const order = doc.data();
-      const tr = document.createElement("tr");
 
-      // Items list
-      const itemsList = order.items.map(i => `${i.name} (x${i.quantity})`).join(", ");
+    ordersData
+      .filter(order => 
+        (!statusFilter || order.status === statusFilter) &&
+        (!searchValue || order.customer.toLowerCase().includes(searchValue))
+      )
+      .forEach(order => {
+        const tr = document.createElement("tr");
+        const itemsList = order.items.map(i => `${i.name} (x${i.quantity})`).join(", ");
+        tr.innerHTML = `
+          <td>${order.customer || "Guest"}</td>
+          <td>${itemsList}</td>
+          <td>${order.total}</td>
+          <td><span class="status ${order.status}">${order.status}</span></td>
+          <td>
+            <select id="status-${order.id}">
+              <option ${order.status==="Processing"?"selected":""}>Processing</option>
+              <option ${order.status==="Shipped"?"selected":""}>Shipped</option>
+              <option ${order.status==="Delivered"?"selected":""}>Delivered</option>
+            </select>
+          </td>
+        `;
+        table.appendChild(tr);
+      });
+  }
 
-      tr.innerHTML = `
-        <td>${order.customer || "Guest"}</td>
-        <td>${itemsList}</td>
-        <td>${order.total}</td>
-        <td><span class="status ${order.status}">${order.status}</span></td>
-        <td>
-          <select id="status-${doc.id}">
-            <option ${order.status==="Processing"?"selected":""}>Processing</option>
-            <option ${order.status==="Shipped"?"selected":""}>Shipped</option>
-            <option ${order.status==="Delivered"?"selected":""}>Delivered</option>
-          </select>
-          <button onclick="updateStatus('${doc.id}')">Update</button>
-        </td>
-      `;
-      table.appendChild(tr);
-    });
+  // 🔹 Listen for orders in real-time
+  db.collection("orders").onSnapshot(snapshot => {
+    ordersData = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+    renderOrders();
   });
 
-  // 🔹 Update status in Firestore
-  function updateStatus(orderId){
+  // 🔹 Single order status update
+  function updateStatus(orderId) {
     const newStatus = document.getElementById(`status-${orderId}`).value;
     db.collection("orders").doc(orderId).update({ status: newStatus });
   }
+
+  // 🔹 Bulk update
+  function updateAllStatuses() {
+    ordersData.forEach(order => {
+      const newStatus = document.getElementById(`status-${order.id}`).value;
+      db.collection("orders").doc(order.id).update({ status: newStatus });
+    });
+    alert("All orders updated successfully!");
+  }
+
+  // 🔹 Search and filter
+  document.getElementById("searchInput").addEventListener("input", renderOrders);
+  document.getElementById("statusFilter").addEventListener("change", renderOrders);
 </script>
 </body>
 </html>
