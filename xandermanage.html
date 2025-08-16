@@ -6,11 +6,87 @@
 <title>Xander | Admin Dashboard</title>
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
 <style>
-body { font-family:'Poppins', sans-serif; background:#f0f2f5; padding:30px; }
-h1 { text-align:center; margin-bottom:30px; }
-.order-card { background:white; border-radius:10px; padding:15px; margin-bottom:15px; box-shadow:0 4px 10px rgba(0,0,0,0.1); }
-button { padding:5px 12px; border:none; border-radius:5px; background:#4caf50; color:white; cursor:pointer; transition:0.3s; }
-button:hover { background:#45a049; }
+body {
+  font-family: 'Poppins', sans-serif;
+  background: linear-gradient(270deg, #ff758c, #ff7eb3, #9face6);
+  background-size: 600% 600%;
+  animation: gradientBG 15s ease infinite;
+  padding: 20px;
+  min-height: 100vh;
+}
+@keyframes gradientBG {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+h1 { text-align:center; color:white; margin-bottom:30px; }
+.order-card {
+  background: rgba(255,255,255,0.9);
+  border-radius: 15px;
+  padding: 20px;
+  margin-bottom: 25px;
+  box-shadow: 0 6px 15px rgba(0,0,0,0.2);
+}
+.order-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+}
+.order-header h3 { font-size: 1.2rem; color: #333; }
+button {
+  padding: 5px 12px;
+  border: none;
+  border-radius: 5px;
+  background: #4caf50;
+  color: white;
+  cursor: pointer;
+  transition: 0.3s;
+  margin-left:5px;
+}
+button:hover { background: #45a049; }
+
+/* Progress Bar */
+.progress-container {
+  position: relative;
+  height: 6px;
+  background: #ddd;
+  border-radius: 3px;
+  margin: 15px 0;
+}
+.progress {
+  height: 6px;
+  background: linear-gradient(90deg, #4caf50, #2ecc71);
+  border-radius: 3px;
+  width: 0;
+  transition: width 0.5s ease-in-out;
+}
+.step {
+  position: absolute;
+  top: -20px;
+  transform: translateX(-50%);
+  text-align: center;
+  width: 80px;
+}
+.step .circle {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: #bbb;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 5px;
+  font-size: 12px;
+  transition: background 0.5s ease-in-out, transform 0.3s;
+}
+.step.active .circle {
+  background: #4caf50;
+  transform: scale(1.1);
+  box-shadow: 0 0 10px rgba(76,175,80,0.8);
+}
+.step .label { font-size: 12px; color: #555; }
 </style>
 </head>
 <body>
@@ -25,7 +101,7 @@ function loadOrdersForAdmin() {
   container.innerHTML = '';
 
   if(!orders.length){
-    container.innerHTML = "<p>No orders yet.</p>";
+    container.innerHTML = "<p style='text-align:center;color:white;'>No orders yet.</p>";
     return;
   }
 
@@ -34,17 +110,57 @@ function loadOrdersForAdmin() {
     const div = document.createElement('div');
     div.className = 'order-card';
     div.innerHTML = `
-      <p><b>${order.name}</b> - Status: ${["Processing","Shipped","Delivered"][order.statusStep]}</p>
-      <button onclick="nextStep(${index})">Next Step</button>
+      <div class="order-header">
+        <h3>${order.name} - $${order.price} (x${order.quantity || 1})</h3>
+        <div>
+          <button onclick="prevStep(${index})">Previous Step</button>
+          <button onclick="nextStep(${index})">Next Step</button>
+        </div>
+      </div>
+      <div class="progress-container">
+        <div class="progress" id="progress-${index}"></div>
+        <div class="step" style="left:0%">
+          <div class="circle" id="circle-${index}-0">1</div>
+          <div class="label">Processing</div>
+        </div>
+        <div class="step" style="left:50%">
+          <div class="circle" id="circle-${index}-1">2</div>
+          <div class="label">Shipped</div>
+        </div>
+        <div class="step" style="left:100%">
+          <div class="circle" id="circle-${index}-2">3</div>
+          <div class="label">Delivered</div>
+        </div>
+      </div>
     `;
     container.appendChild(div);
+    updateUI(index, order.statusStep);
   });
+}
+
+function updateUI(orderIndex, step){
+  const progressBar = document.getElementById(`progress-${orderIndex}`);
+  for(let i=0;i<=2;i++){
+    const circle = document.getElementById(`circle-${orderIndex}-${i}`);
+    if(i <= step) circle.classList.add('active');
+    else circle.classList.remove('active');
+  }
+  progressBar.style.width = `${(step/2)*100}%`;
 }
 
 function nextStep(orderIndex){
   let orders = JSON.parse(localStorage.getItem('pastOrders') || '[]');
   if(orders[orderIndex].statusStep < 2){
     orders[orderIndex].statusStep++;
+    localStorage.setItem('pastOrders', JSON.stringify(orders));
+  }
+  loadOrdersForAdmin();
+}
+
+function prevStep(orderIndex){
+  let orders = JSON.parse(localStorage.getItem('pastOrders') || '[]');
+  if(orders[orderIndex].statusStep > 0){
+    orders[orderIndex].statusStep--;
     localStorage.setItem('pastOrders', JSON.stringify(orders));
   }
   loadOrdersForAdmin();
