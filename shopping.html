@@ -1,64 +1,179 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Shop | Xander</title>
-<style>
-body { font-family:'Poppins',sans-serif; margin:0; background:#f0f0f0; }
-header { display:flex; justify-content:space-between; align-items:center; padding:15px 40px; background:#0072ff; color:#fff;}
-header a { color:#fff; margin:0 10px; text-decoration:none; }
-.products { display:grid; grid-template-columns:repeat(auto-fit,minmax(250px,1fr)); gap:20px; padding:40px; }
-.product-card { background:#fff; border-radius:12px; text-align:center; padding:15px; box-shadow:0 4px 10px rgba(0,0,0,0.2); }
-.product-card img { width:100%; border-radius:8px; margin-bottom:10px; }
-.product-card button { padding:8px 12px; border:none; border-radius:20px; cursor:pointer; background:#0072ff; color:#fff; transition:0.3s; }
-.product-card button:hover { background:#005bb5; }
-</style>
+  <meta charset="UTF-8">
+  <title>Xander | Shop</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    /* ==== Reset ==== */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: Arial, sans-serif;
+      background: #f5f5f5;
+      color: #333;
+    }
+
+    /* ==== Header ==== */
+    header {
+      background: linear-gradient(90deg, #ff6b6b, #f06595);
+      color: white;
+      padding: 15px 30px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    header h1 {
+      font-size: 1.8rem;
+    }
+
+    nav a {
+      color: white;
+      margin-left: 20px;
+      text-decoration: none;
+      font-weight: bold;
+    }
+
+    nav a:hover {
+      text-decoration: underline;
+    }
+
+    .cart-btn {
+      background: white;
+      color: #ff6b6b;
+      padding: 6px 14px;
+      border-radius: 8px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    .profile-btn {
+      background: white;
+      color: #ff6b6b;
+      padding: 6px 14px;
+      border-radius: 6px;
+      font-weight: bold;
+      cursor: pointer;
+      margin-left: 10px;
+    }
+
+    /* ==== Product Grid ==== */
+    .product-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 20px;
+      padding: 30px;
+    }
+
+    .product {
+      background: white;
+      padding: 15px;
+      border-radius: 12px;
+      text-align: center;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+      transition: transform 0.2s ease;
+    }
+
+    .product:hover {
+      transform: translateY(-5px);
+    }
+
+    .product img {
+      width: 250px;
+      height: 250px;
+      object-fit: cover;
+      border-radius: 10px;
+      display: block;
+      margin: 0 auto 15px;
+    }
+
+    .product h3 {
+      font-size: 1.1rem;
+      margin-bottom: 8px;
+    }
+
+    .product p {
+      font-size: 1rem;
+      margin-bottom: 12px;
+      color: #666;
+    }
+
+    .product button {
+      background: #ff6b6b;
+      color: white;
+      border: none;
+      padding: 8px 14px;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+
+    .product button:hover {
+      background: #e55a5a;
+    }
+  </style>
 </head>
 <body>
+
 <header>
-<h1>Shop</h1>
-<nav>
-<a href="index.html">Home</a>
-<a href="cart.html">Cart</a>
-<a href="yourprofile.html">Profile</a>
-</nav>
-<div class="profile-btn" onclick="window.location.href='yourprofile.html'">U</div>
+  <h1>Xander | Shop</h1>
+  <nav>
+    <a href="index.html">Home</a>
+    <a href="shop.html">Shop</a>
+    <a href="cart.html" class="cart-btn">Cart (<span id="cartCount">0</span>)</a>
+    <button class="profile-btn" onclick="window.location.href='profile.html'">Profile</button>
+  </nav>
 </header>
 
-<section class="products" id="productGrid"></section>
+<main>
+  <div class="product-grid" id="productList"></div>
+</main>
 
 <script>
-const products=[
-{name:"Stylish T-Shirt", price:20, img:"https://via.placeholder.com/300x300?text=T-Shirt"},
-{name:"Wireless Headphones", price:50, img:"https://via.placeholder.com/300x300?text=Headphones"},
-{name:"Running Shoes", price:70, img:"https://via.placeholder.com/300x300?text=Shoes"},
-{name:"Smartphone", price:300, img:"https://via.placeholder.com/300x300?text=Phone"},
-{name:"Camera", price:250, img:"https://via.placeholder.com/300x300?text=Camera"},
-{name:"USB Cables", price:10, img:"https://via.placeholder.com/300x300?text=Cables"}
-];
+  const products = [
+    { name:"Stylish T-Shirt", price:20, img:"images/tshirt.jpg" },
+    { name:"Wireless Headphones", price:50, img:"images/headphones.jpg" },
+    { name:"Running Shoes", price:70, img:"images/shoes.jpg" },
+    { name:"Smartphone", price:300, img:"images/phone.jpg" },
+    { name:"Camera", price:250, img:"images/camera.jpg" },
+    { name:"USB Cables", price:10, img:"images/cables.jpg" }
+  ];
 
-function renderProducts(){
-  const grid=document.getElementById('productGrid');
-  grid.innerHTML='';
-  products.forEach(p=>{
-    const div=document.createElement('div');
-    div.className='product-card';
-    div.innerHTML=`<img src="${p.img}" alt="${p.name}"><h3>${p.name}</h3><p>$${p.price}</p>
-      <button onclick="addToCart('${p.name}',${p.price})">Add to Cart</button>`;
-    grid.appendChild(div);
+  // Load cart count
+  function updateCartCount() {
+    const cart = JSON.parse(localStorage.getItem('cart')) || [];
+    document.getElementById('cartCount').innerText = cart.length;
+  }
+
+  // Add to cart
+  function addToCart(product) {
+    let cart = JSON.parse(localStorage.getItem('cart')) || [];
+    cart.push(product);
+    localStorage.setItem('cart', JSON.stringify(cart));
+    updateCartCount();
+  }
+
+  // Render products
+  const productList = document.getElementById('productList');
+  products.forEach(product => {
+    const div = document.createElement('div');
+    div.classList.add('product');
+    div.innerHTML = `
+      <img src="${product.img}" alt="${product.name}">
+      <h3>${product.name}</h3>
+      <p>$${product.price}</p>
+      <button onclick='addToCart(${JSON.stringify(product)})'>Add to Cart</button>
+    `;
+    productList.appendChild(div);
   });
-}
 
-function addToCart(name,price){
-  const cart = JSON.parse(localStorage.getItem('cart')||'[]');
-  const exists=cart.find(i=>i.name===name);
-  if(exists){ exists.quantity+=1; } else { cart.push({name,price,quantity:1}); }
-  localStorage.setItem('cart',JSON.stringify(cart));
-  alert(`${name} added to cart!`);
-}
-
-renderProducts();
+  updateCartCount();
 </script>
+
 </body>
 </html>
