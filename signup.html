@@ -4,121 +4,113 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Xander | Sign Up</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
 <style>
-  body {
-    margin: 0;
-    font-family: 'Segoe UI', sans-serif;
-    background: linear-gradient(135deg, #fbcfe8, #c4b5fd, #818cf8);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    min-height: 100vh;
-    transition: background 0.3s;
-  }
+body {
+  font-family: 'Poppins', sans-serif;
+  background: linear-gradient(270deg,#ff758c,#ff7eb3,#9face6);
+  background-size: 600% 600%;
+  animation: gradientBG 15s ease infinite;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  margin: 0;
+}
 
-  .signup-container {
-    background: white;
-    padding: 40px;
-    border-radius: 25px;
-    box-shadow: 0 10px 25px rgba(0,0,0,0.1);
-    width: 100%;
-    max-width: 400px;
-    text-align: center;
-  }
+@keyframes gradientBG {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
 
-  h1 {
-    margin-bottom: 20px;
-    color: #4f46e5;
-  }
+.signup-container {
+  background: rgba(255,255,255,0.9);
+  padding: 40px;
+  border-radius: 15px;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+  width: 320px;
+}
 
-  input {
-    width: 100%;
-    padding: 12px;
-    margin: 10px 0;
-    border-radius: 10px;
-    border: 1px solid #ddd;
-    font-size: 16px;
-  }
+.signup-container h2 {
+  text-align: center;
+  margin-bottom: 25px;
+  color: #333;
+}
 
-  .submit-btn {
-    width: 100%;
-    padding: 12px;
-    margin-top: 15px;
-    border: none;
-    border-radius: 10px;
-    background-color: #6366f1;
-    color: white;
-    font-weight: bold;
-    cursor: pointer;
-    font-size: 16px;
-    transition: background 0.3s, transform 0.2s;
-  }
+.signup-container input {
+  width: 100%;
+  padding: 10px;
+  margin: 10px 0;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+}
 
-  .submit-btn:hover {
-    background-color: #4f46e5;
-    transform: scale(1.05);
-  }
+.signup-container button {
+  width: 100%;
+  padding: 12px;
+  background: #0072ff;
+  color: #fff;
+  border: none;
+  border-radius: 25px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: 0.3s;
+}
 
-  .signin-link {
-    display: block;
-    margin-top: 20px;
-    color: #4f46e5;
-    text-decoration: none;
-    font-weight: bold;
-  }
+.signup-container button:hover {
+  background: #005bb5;
+}
 
-  .signin-link:hover { text-decoration: underline; }
+.signup-container p {
+  text-align: center;
+  margin-top: 15px;
+  font-size: 0.9rem;
+}
 
-  .error { color: red; font-size: 0.9rem; }
+.signup-container p a {
+  color: #0072ff;
+  text-decoration: none;
+}
+
+.signup-container p a:hover {
+  text-decoration: underline;
+}
 </style>
 </head>
 <body>
 
 <div class="signup-container">
-  <h1>Sign Up</h1>
-  <input type="text" id="name" placeholder="Full Name" required>
-  <input type="email" id="email" placeholder="Email Address" required>
+  <h2>Create Account</h2>
+  <input type="text" id="username" placeholder="Username" required>
+  <input type="email" id="email" placeholder="Email" required>
   <input type="password" id="password" placeholder="Password" required>
-  <input type="password" id="confirmPassword" placeholder="Confirm Password" required>
-  <div class="error" id="errorMsg"></div>
-  <button class="submit-btn" onclick="signUp()">Create Account</button>
-  <a href="signin.html" class="signin-link">Already have an account? Sign In</a>
+  <button onclick="signup()">Sign Up</button>
+  <p>Already have an account? <a href="signin.html">Sign In</a></p>
 </div>
 
 <script>
-  function signUp() {
-    const name = document.getElementById("name").value.trim();
-    const email = document.getElementById("email").value.trim();
-    const password = document.getElementById("password").value;
-    const confirmPassword = document.getElementById("confirmPassword").value;
-    const errorMsg = document.getElementById("errorMsg");
+function signup() {
+  const username = document.getElementById('username').value.trim();
+  const email = document.getElementById('email').value.trim();
+  const password = document.getElementById('password').value.trim();
 
-    // Validation
-    if (!name || !email || !password || !confirmPassword) {
-      errorMsg.textContent = "Please fill in all fields!";
-      return;
-    }
-
-    if (password !== confirmPassword) {
-      errorMsg.textContent = "Passwords do not match!";
-      return;
-    }
-
-    // Save user to localStorage
-    let users = JSON.parse(localStorage.getItem("users")) || [];
-    if (users.some(u => u.email === email)) {
-      errorMsg.textContent = "Email already registered!";
-      return;
-    }
-
-    users.push({ name, email, password });
-    localStorage.setItem("users", JSON.stringify(users));
-    localStorage.setItem("loggedIn", "true");
-    localStorage.setItem("userData", JSON.stringify({ name, email }));
-
-    // Redirect to home page
-    window.location.href = "index.html";
+  if (!username || !email || !password) {
+    alert('Please fill all fields.');
+    return;
   }
+
+  // Save user info in localStorage
+  const user = { username, email, password };
+  localStorage.setItem('user', JSON.stringify(user));
+
+  // Save global username/email for profile button
+  localStorage.setItem('username', username);
+  localStorage.setItem('email', email);
+
+  alert('Account created successfully!');
+  window.location.href = 'index.html';
+}
 </script>
 
 </body>
