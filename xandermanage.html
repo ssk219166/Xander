@@ -5,20 +5,125 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Xander | Admin Dashboard</title>
 <style>
-  body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f0f2f5; margin:0; padding:20px; }
-  h1 { text-align:center; color:#1a1a1a; margin-bottom:20px; }
-  .controls { display:flex; justify-content:space-between; margin-bottom:15px; flex-wrap:wrap; gap:10px; }
-  .controls input, .controls select, .controls button { padding:8px 10px; border-radius:5px; font-size:14px; }
-  .controls button { background:#4CAF50; color:white; border:none; cursor:pointer; }
-  .controls button:hover { background:#45a049; }
-  table { width:100%; border-collapse: collapse; background:white; box-shadow:0 4px 12px rgba(0,0,0,0.1); }
-  th, td { padding:12px; border-bottom:1px solid #ddd; text-align:left; font-size:14px; }
-  th { background:#333; color:white; text-transform:uppercase; font-weight:600; }
-  tr:hover { background:#f9f9f9; }
-  .status { font-weight:bold; padding:5px 10px; border-radius:6px; display:inline-block; min-width:80px; text-align:center; }
-  .Processing { background:orange; color:white; }
-  .Shipped { background:dodgerblue; color:white; }
-  .Delivered { background:green; color:white; }
+/* General */
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background: #f0f2f5;
+  margin: 0;
+  padding: 20px;
+}
+h1 {
+  text-align: center;
+  color: #1a1a1a;
+  margin-bottom: 20px;
+}
+
+/* Controls */
+.controls {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 15px;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+.controls input, .controls select {
+  padding: 8px 10px;
+  border-radius: 5px;
+  font-size: 14px;
+}
+
+/* Table */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  background: white;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  margin-bottom: 30px;
+}
+th, td {
+  padding: 12px;
+  border-bottom: 1px solid #ddd;
+  text-align: left;
+  font-size: 14px;
+  vertical-align: top;
+}
+th {
+  background: #333;
+  color: white;
+  text-transform: uppercase;
+  font-weight: 600;
+}
+tr:hover {
+  background: #f9f9f9;
+}
+
+/* Status & buttons */
+.status {
+  font-weight: bold;
+  padding: 5px 10px;
+  border-radius: 6px;
+  display: inline-block;
+  min-width: 80px;
+  text-align: center;
+}
+.Processing { background: orange; color: white; }
+.Shipped { background: dodgerblue; color: white; }
+.Delivered { background: green; color: white; }
+.next-btn {
+  padding: 5px 10px;
+  margin-left: 5px;
+  background: #4CAF50;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+.next-btn:hover { background: #45a049; }
+
+/* Progress Steps */
+.progress-container {
+  position: relative;
+  height: 6px;
+  background: #ddd;
+  border-radius: 3px;
+  margin: 10px 0 5px 0;
+}
+.progress {
+  height: 6px;
+  background: linear-gradient(90deg,#4caf50,#2ecc71);
+  border-radius: 3px;
+  width: 0;
+  transition: width 0.5s ease-in-out;
+}
+.step {
+  position: absolute;
+  top: -15px;
+  transform: translateX(-50%);
+  text-align: center;
+  width: 60px;
+}
+.step .circle {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: #bbb;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 3px;
+  font-size: 10px;
+  transition: background 0.5s ease-in-out, transform 0.3s;
+}
+.step.active .circle {
+  background: #4caf50;
+  transform: scale(1.1);
+  box-shadow: 0 0 5px rgba(76,175,80,0.8);
+}
+.step .label {
+  font-size: 10px;
+  color: #555;
+}
 </style>
 </head>
 <body>
@@ -51,7 +156,6 @@
 <script>
 // Load orders from localStorage or create sample data
 let ordersData = JSON.parse(localStorage.getItem('pastOrders') || '[]');
-
 if (!ordersData.length) {
   ordersData = [
     { customer: "Alice", items:[{name:"Phone", quantity:1}], total:500, status:"Processing", statusStep:0 },
@@ -79,31 +183,78 @@ function renderOrdersTable() {
         <td>${order.customer || "Guest"}</td>
         <td>${itemsList}</td>
         <td>${order.total}</td>
-        <td><span class="status ${order.status}">${order.status}</span></td>
+        <td>
+          <span class="status ${order.status}">${order.status}</span>
+          <div class="progress-container">
+            <div class="progress" id="progress-${index}"></div>
+            <div class="step" style="left:0%">
+              <div class="circle" id="circle-${index}-0">1</div>
+              <div class="label">Processing</div>
+            </div>
+            <div class="step" style="left:50%">
+              <div class="circle" id="circle-${index}-1">2</div>
+              <div class="label">Shipped</div>
+            </div>
+            <div class="step" style="left:100%">
+              <div class="circle" id="circle-${index}-2">3</div>
+              <div class="label">Delivered</div>
+            </div>
+          </div>
+        </td>
         <td>
           <select id="status-${index}" onchange="updateStatus(${index})">
             <option ${order.status==="Processing"?"selected":""}>Processing</option>
             <option ${order.status==="Shipped"?"selected":""}>Shipped</option>
             <option ${order.status==="Delivered"?"selected":""}>Delivered</option>
           </select>
+          <button class="next-btn" onclick="advanceStep(${index})">Next Step</button>
         </td>
       `;
       table.appendChild(tr);
+      updateProgressUI(index, order.statusStep);
     });
 }
 
-// Update single order status manually
+// Update progress UI
+function updateProgressUI(orderIndex, step) {
+  const progressBar = document.getElementById(`progress-${orderIndex}`);
+  for (let i = 0; i <= 2; i++) {
+    const circle = document.getElementById(`circle-${orderIndex}-${i}`);
+    if (i <= step) circle.classList.add('active');
+    else circle.classList.remove('active');
+  }
+  progressBar.style.width = `${(step / 2) * 100}%`;
+}
+
+// Update single order from dropdown
 function updateStatus(index) {
   const newStatus = document.getElementById(`status-${index}`).value;
   ordersData[index].status = newStatus;
   ordersData[index].statusStep = newStatus === "Processing" ? 0 : newStatus === "Shipped" ? 1 : 2;
   localStorage.setItem('pastOrders', JSON.stringify(ordersData));
-  renderOrdersTable(); // refresh table
+  renderOrdersTable();
 }
 
-// Search and filter events
+// Advance step manually
+function advanceStep(index) {
+  let step = ordersData[index].statusStep || 0;
+  if (step >= 2) return;
+  step++;
+  ordersData[index].statusStep = step;
+  ordersData[index].status = step === 1 ? "Shipped" : "Delivered";
+  localStorage.setItem('pastOrders', JSON.stringify(ordersData));
+  renderOrdersTable();
+}
+
+// Search & filter
 document.getElementById("searchInput").addEventListener("input", renderOrdersTable);
 document.getElementById("statusFilter").addEventListener("change", renderOrdersTable);
+
+// Real-time auto-refresh across tabs
+window.addEventListener('storage', () => {
+  ordersData = JSON.parse(localStorage.getItem('pastOrders') || '[]');
+  renderOrdersTable();
+});
 
 // Initial render
 renderOrdersTable();
