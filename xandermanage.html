@@ -1,171 +1,115 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Xander | Admin Dashboard</title>
-  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js"></script>
-  <style>
-    body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background: #f0f2f5;
-      margin: 0;
-      padding: 20px;
-    }
-    h1 {
-      text-align: center;
-      color: #1a1a1a;
-      margin-bottom: 20px;
-    }
-    .controls {
-      display: flex;
-      justify-content: space-between;
-      margin-bottom: 15px;
-      flex-wrap: wrap;
-      gap: 10px;
-    }
-    .controls input, .controls select {
-      padding: 8px 10px;
-      border-radius: 5px;
-      border: 1px solid #ccc;
-      font-size: 14px;
-    }
-    .controls button {
-      padding: 8px 15px;
-      border: none;
-      border-radius: 5px;
-      background: #4CAF50;
-      color: white;
-      cursor: pointer;
-      font-size: 14px;
-    }
-    .controls button:hover { background: #45a049; }
-
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      background: white;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-    }
-    th, td {
-      padding: 12px;
-      border-bottom: 1px solid #ddd;
-      text-align: left;
-      font-size: 14px;
-    }
-    th {
-      background: #333;
-      color: white;
-      text-transform: uppercase;
-      font-weight: 600;
-    }
-    tr:hover { background: #f9f9f9; }
-
-    select, button {
-      padding: 5px 10px;
-      margin-right: 5px;
-      font-size: 13px;
-    }
-
-    .status {
-      font-weight: bold;
-      padding: 5px 10px;
-      border-radius: 6px;
-      display: inline-block;
-      min-width: 80px;
-      text-align: center;
-    }
-    .Processing { background: orange; color: white; }
-    .Shipped { background: dodgerblue; color: white; }
-    .Delivered { background: green; color: white; }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Xander | Admin Dashboard</title>
+<style>
+  body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f0f2f5; margin:0; padding:20px; }
+  h1 { text-align:center; color:#1a1a1a; margin-bottom:20px; }
+  .controls { display:flex; justify-content:space-between; margin-bottom:15px; flex-wrap:wrap; gap:10px; }
+  .controls input, .controls select, .controls button { padding:8px 10px; border-radius:5px; font-size:14px; }
+  .controls button { background:#4CAF50; color:white; border:none; cursor:pointer; }
+  .controls button:hover { background:#45a049; }
+  table { width:100%; border-collapse: collapse; background:white; box-shadow:0 4px 12px rgba(0,0,0,0.1); }
+  th, td { padding:12px; border-bottom:1px solid #ddd; text-align:left; font-size:14px; }
+  th { background:#333; color:white; text-transform:uppercase; font-weight:600; }
+  tr:hover { background:#f9f9f9; }
+  .status { font-weight:bold; padding:5px 10px; border-radius:6px; display:inline-block; min-width:80px; text-align:center; }
+  .Processing { background:orange; color:white; }
+  .Shipped { background:dodgerblue; color:white; }
+  .Delivered { background:green; color:white; }
+</style>
 </head>
 <body>
-  <h1>📦 Xander Admin Dashboard</h1>
 
-  <div class="controls">
-    <input type="text" id="searchInput" placeholder="Search by customer...">
-    <select id="statusFilter">
-      <option value="">All Statuses</option>
-      <option value="Processing">Processing</option>
-      <option value="Shipped">Shipped</option>
-      <option value="Delivered">Delivered</option>
-    </select>
-    <button onclick="updateAllStatuses()">Update All Orders</button>
-  </div>
+<h1>📦 Xander Admin Dashboard</h1>
 
-  <table>
-    <thead>
-      <tr>
-        <th>Customer</th>
-        <th>Items</th>
-        <th>Total ($)</th>
-        <th>Status</th>
-        <th>Update</th>
-      </tr>
-    </thead>
-    <tbody id="ordersTable"></tbody>
-  </table>
+<div class="controls">
+  <input type="text" id="searchInput" placeholder="Search by customer...">
+  <select id="statusFilter">
+    <option value="">All Statuses</option>
+    <option value="Processing">Processing</option>
+    <option value="Shipped">Shipped</option>
+    <option value="Delivered">Delivered</option>
+  </select>
+  <button onclick="updateAllStatuses()">Update All Orders</button>
+</div>
+
+<table>
+  <thead>
+    <tr>
+      <th>Customer</th>
+      <th>Items</th>
+      <th>Total ($)</th>
+      <th>Status</th>
+      <th>Update</th>
+    </tr>
+  </thead>
+  <tbody id="ordersTable"></tbody>
+</table>
 
 <script>
-  // 🔹 Render orders in table
-  function renderOrders() {
-    const table = document.getElementById("ordersTable");
-    const searchValue = document.getElementById("searchInput").value.toLowerCase();
-    const statusFilter = document.getElementById("statusFilter").value;
+let ordersData = JSON.parse(localStorage.getItem('pastOrders') || '[]');
 
-    table.innerHTML = "";
+// Sample initial data if no orders exist
+if (!ordersData.length) {
+  ordersData = [
+    { customer: "Alice", items:[{name:"Phone", quantity:1}], total:500, status:"Processing", statusStep:0 },
+    { customer: "Bob", items:[{name:"Camera", quantity:2}], total:1200, status:"Processing", statusStep:0 }
+  ];
+  localStorage.setItem('pastOrders', JSON.stringify(ordersData));
+}
 
-    ordersData
-      .filter(order => 
-        (!statusFilter || order.status === statusFilter) &&
-        (!searchValue || order.customer.toLowerCase().includes(searchValue))
-      )
-      .forEach(order => {
-        const tr = document.createElement("tr");
-        const itemsList = order.items.map(i => `${i.name} (x${i.quantity})`).join(", ");
-        tr.innerHTML = `
-          <td>${order.customer || "Guest"}</td>
-          <td>${itemsList}</td>
-          <td>${order.total}</td>
-          <td><span class="status ${order.status}">${order.status}</span></td>
-          <td>
-            <select id="status-${order.id}">
-              <option ${order.status==="Processing"?"selected":""}>Processing</option>
-              <option ${order.status==="Shipped"?"selected":""}>Shipped</option>
-              <option ${order.status==="Delivered"?"selected":""}>Delivered</option>
-            </select>
-          </td>
-        `;
-        table.appendChild(tr);
-      });
-  }
+function renderOrdersTable() {
+  const table = document.getElementById("ordersTable");
+  const searchValue = document.getElementById("searchInput").value.toLowerCase();
+  const statusFilter = document.getElementById("statusFilter").value;
 
-  // 🔹 Listen for orders in real-time
-  db.collection("orders").onSnapshot(snapshot => {
-    ordersData = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-    renderOrders();
-  });
+  table.innerHTML = "";
 
-  // 🔹 Single order status update
-  function updateStatus(orderId) {
-    const newStatus = document.getElementById(`status-${orderId}`).value;
-    db.collection("orders").doc(orderId).update({ status: newStatus });
-  }
-
-  // 🔹 Bulk update
-  function updateAllStatuses() {
-    ordersData.forEach(order => {
-      const newStatus = document.getElementById(`status-${order.id}`).value;
-      db.collection("orders").doc(order.id).update({ status: newStatus });
+  ordersData
+    .filter(order =>
+      (!statusFilter || order.status === statusFilter) &&
+      (!searchValue || order.customer.toLowerCase().includes(searchValue))
+    )
+    .forEach((order, index) => {
+      const tr = document.createElement("tr");
+      const itemsList = order.items.map(i => `${i.name} (x${i.quantity})`).join(", ");
+      tr.innerHTML = `
+        <td>${order.customer || "Guest"}</td>
+        <td>${itemsList}</td>
+        <td>${order.total}</td>
+        <td><span class="status ${order.status}">${order.status}</span></td>
+        <td>
+          <select id="status-${index}">
+            <option ${order.status==="Processing"?"selected":""}>Processing</option>
+            <option ${order.status==="Shipped"?"selected":""}>Shipped</option>
+            <option ${order.status==="Delivered"?"selected":""}>Delivered</option>
+          </select>
+        </td>
+      `;
+      table.appendChild(tr);
     });
-    alert("All orders updated successfully!");
-  }
+}
 
-  // 🔹 Search and filter
-  document.getElementById("searchInput").addEventListener("input", renderOrders);
-  document.getElementById("statusFilter").addEventListener("change", renderOrders);
+function updateAllStatuses() {
+  ordersData.forEach((order, index) => {
+    const newStatus = document.getElementById(`status-${index}`).value;
+    order.status = newStatus;
+    order.statusStep = newStatus === "Processing" ? 0 : newStatus === "Shipped" ? 1 : 2;
+  });
+  localStorage.setItem('pastOrders', JSON.stringify(ordersData));
+  renderOrdersTable();
+  alert("All orders updated successfully!");
+}
+
+// Search and filter events
+document.getElementById("searchInput").addEventListener("input", renderOrdersTable);
+document.getElementById("statusFilter").addEventListener("change", renderOrdersTable);
+
+renderOrdersTable();
 </script>
+
 </body>
 </html>
