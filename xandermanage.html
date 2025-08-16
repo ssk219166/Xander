@@ -109,21 +109,6 @@
   </table>
 
 <script>
-  // 🔹 Firebase config
-  const firebaseConfig = {
-    apiKey: "YOUR_API_KEY",
-    authDomain: "YOUR_PROJECT.firebaseapp.com",
-    projectId: "YOUR_PROJECT",
-    storageBucket: "YOUR_PROJECT.appspot.com",
-    messagingSenderId: "123456789",
-    appId: "APP_ID"
-  };
-
-  const app = firebase.initializeApp(firebaseConfig);
-  const db = firebase.firestore();
-
-  let ordersData = []; // Keep all orders in memory
-
   // 🔹 Render orders in table
   function renderOrders() {
     const table = document.getElementById("ordersTable");
