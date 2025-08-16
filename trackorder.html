@@ -72,7 +72,7 @@ h2 { text-align:center; margin-bottom:30px; color:white; }
 // Function to load and display orders for the current user
 function loadOrders() {
   const currentUser = localStorage.getItem('currentUser'); // Logged-in customer's name
-  const allOrders = JSON.parse(localStorage.getItem('pastOrders') || '[]');
+  const allOrders = JSON.parse(localStorage.getItem('allOrders') || '[]');
 
   // Filter orders for current user only
   const orders = allOrders.filter(order => order.customer === currentUser);
