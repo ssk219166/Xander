@@ -59,7 +59,7 @@ button:hover { background: #45a049; }
   background: linear-gradient(90deg, #4caf50, #2ecc71);
   border-radius: 3px;
   width: 0;
-  transition: width 0.5s ease-in-out;
+  transition: width 0.4s ease-in-out;
 }
 .step {
   position: absolute;
@@ -79,7 +79,7 @@ button:hover { background: #45a049; }
   justify-content: center;
   margin: 0 auto 5px;
   font-size: 12px;
-  transition: background 0.5s ease-in-out, transform 0.3s;
+  transition: background 0.4s ease-in-out, transform 0.3s;
 }
 .step.active .circle {
   background: #4caf50;
@@ -135,36 +135,22 @@ function loadOrdersForAdmin() {
       </div>
     `;
     container.appendChild(div);
-    updateUI(index, order.statusStep);
+    renderProgress(index, order.statusStep);
   });
 }
 
-function updateUI(orderIndex, step){
+// Render progress bar & circles for a specific order
+function renderProgress(orderIndex, step) {
   const progressBar = document.getElementById(`progress-${orderIndex}`);
-
-  // Animate circles gradually
   for(let i=0;i<=2;i++){
     const circle = document.getElementById(`circle-${orderIndex}-${i}`);
     if(i <= step){
-      setTimeout(()=>circle.classList.add('active'), i*300);
+      circle.classList.add('active');
     } else {
       circle.classList.remove('active');
     }
   }
-
-  // Animate progress bar
-  const targetWidth = (step/2)*100;
-  let currentWidth = parseFloat(progressBar.style.width) || 0;
-  const stepsCount = 20;
-  const stepSize = (targetWidth - currentWidth)/stepsCount;
-  let counter = 0;
-
-  const animate = setInterval(()=>{
-    currentWidth += stepSize;
-    progressBar.style.width = currentWidth+'%';
-    counter++;
-    if(counter>=stepsCount) clearInterval(animate);
-  }, 20);
+  progressBar.style.width = (step/2)*100 + '%';
 }
 
 function nextStep(orderIndex){
@@ -173,7 +159,7 @@ function nextStep(orderIndex){
     orders[orderIndex].statusStep++;
     localStorage.setItem('pastOrders', JSON.stringify(orders));
   }
-  loadOrdersForAdmin();
+  renderProgress(orderIndex, orders[orderIndex].statusStep);
 }
 
 function prevStep(orderIndex){
@@ -182,7 +168,7 @@ function prevStep(orderIndex){
     orders[orderIndex].statusStep--;
     localStorage.setItem('pastOrders', JSON.stringify(orders));
   }
-  loadOrdersForAdmin();
+  renderProgress(orderIndex, orders[orderIndex].statusStep);
 }
 
 // Real-time sync across tabs
@@ -196,4 +182,3 @@ loadOrdersForAdmin();
 
 </body>
 </html>
-
