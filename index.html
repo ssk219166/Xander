@@ -1,14 +1,12 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Xander | Online Shopping</title>
-  
-  <!-- Google Fonts -->
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
-
-  <style>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Xander | Home</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet"/>
+<script type="module" src="firebase-config.js"></script>
+<style>
     /* Reset & Fonts */
     * {
       margin: 0;
@@ -190,111 +188,50 @@
     body.dark-mode header, body.dark-mode footer {
       background: rgba(255,255,255,0.1);
     }
-  </style>
+</style>
 </head>
 <body>
-
-  <header>
+<header>
   <h1>Xander</h1>
   <nav>
     <a href="index.html">Home</a>
-    <a href="shopping.html">Shop</a>
-    <a href="cart.html">Cart</a>
-    <a href="contact.html">Contact</a>
-    <a href="trackorder.html">My Orders</a>
+    <a href="shop.html">Shop</a>
+    <a href="profile.html">Profile</a>
   </nav>
   <div style="display:flex;align-items:center;gap:10px;">
     <span id="cart-count">🛒 0</span>
-    <div class="profile-btn" onclick="window.location.href='yourprofile.html'">U</div>
+    <div class="profile-btn" id="profileBtn">U</div>
   </div>
 </header>
 
+<section class="hero">
+  <h2>Welcome to Xander Online Shopping</h2>
+  <p>Your one-stop shop for fashion, electronics, and more.</p>
+  <button onclick="window.location.href='shop.html'">Shop Now</button>
+</section>
 
-  <section class="hero">
-    <h2>Welcome to Xander Online Shopping</h2>
-    <p>Your one-stop shop for fashion, electronics, and more.</p>
-    <button onclick="window.location.href='shopping.html'">Shop Now</button>
-  </section>
+<script type="module">
+import { auth } from './firebase-config.js';
+import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
 
-  <section class="products">
-    <div class="product-card">
-      <img src="OIP (1).jpg" alt="T-Shirt">
-      <h3>Stylish T-Shirt</h3>
-      <p>$20</p>
-      <button onclick="addToCart('Stylish T-Shirt', 20)">Add to Cart</button>
-    </div>
-    <div class="product-card">
-      <img src="OIP2.jpg" alt="Headphones">
-      <h3>Wireless Headphones</h3>
-      <p>$50</p>
-      <button onclick="addToCart('Wireless Headphones', 50)">Add to Cart</button>
-    </div>
-    <div class="product-card">
-      <img src="OIP3.jpg" alt="Shoes">
-      <h3>Running Shoes</h3>
-      <p>$70</p>
-      <button onclick="addToCart('Running Shoes', 70)">Add to Cart</button>
-    </div>
-  </section>
-
-  <footer>
-    <p>© 2025 Xander Online Shopping. All Rights Reserved.</p>
-  </footer>
-
- <script>
-// User Profile Initial
-function loadProfileInitial() {
-  const name = localStorage.getItem('username') || 'U';
-  document.querySelector('.profile-btn').textContent = name.charAt(0).toUpperCase();
-}
-
-// Cart Count
-function updateCartCount() {
-  const cart = JSON.parse(localStorage.getItem('cart') || '[]');
-  document.getElementById('cart-count').textContent = `🛒 ${cart.length}`;
-}
-
-// Add to Cart
-function addToCart(name, price) {
-  const cart = JSON.parse(localStorage.getItem('cart') || '[]');
-  let existing = cart.find(item => item.name === name);
-  if(existing){ existing.quantity += 1; } else { cart.push({name, price, quantity:1}); }
-  localStorage.setItem('cart', JSON.stringify(cart));
-  updateCartCount();
-}
-
-// Load products
-const products = [
-  {name:"Stylish T-Shirt", price:20, img:"https://via.placeholder.com/300?text=T-Shirt"},
-  {name:"Wireless Headphones", price:50, img:"https://via.placeholder.com/300?text=Headphones"},
-  {name:"Running Shoes", price:70, img:"https://via.placeholder.com/300?text=Shoes"},
-  {name:"Smartphone", price:300, img:"https://via.placeholder.com/300?text=Phone"},
-  {name:"Camera", price:150, img:"https://via.placeholder.com/300?text=Camera"},
-  {name:"Cables Pack", price:15, img:"https://via.placeholder.com/300?text=Cables"}
-];
-
-const productGrid = document.getElementById('productGrid');
-products.forEach(p=>{
-  productGrid.innerHTML += `
-  <div class="product-card">
-    <img src="${p.img}" alt="${p.name}">
-    <h3>${p.name}</h3>
-    <p>$${p.price}</p>
-    <button onclick="addToCart('${p.name}',${p.price})">Add to Cart</button>
-  </div>`;
+// Update profile button and cart
+onAuthStateChanged(auth, user => {
+  const profileBtn = document.getElementById('profileBtn');
+  if(user){
+    profileBtn.textContent = user.displayName ? user.displayName.charAt(0).toUpperCase() : "U";
+    profileBtn.onclick = ()=> window.location.href='profile.html';
+  } else {
+    profileBtn.textContent = "U";
+    profileBtn.onclick = ()=> window.location.href='signin.html';
+  }
 });
 
-loadProfileInitial();
+// Cart count from localStorage
+function updateCartCount(){
+  const cart = JSON.parse(localStorage.getItem('cart')||'[]');
+  document.getElementById('cart-count').textContent=`🛒 ${cart.length}`;
+}
 updateCartCount();
 </script>
-
-
 </body>
 </html>
-
-
-
-
-
-
-
