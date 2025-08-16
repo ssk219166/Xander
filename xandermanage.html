@@ -1,96 +1,101 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Xander Admin | Manage Orders</title>
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
-<style>
-body {
-  font-family: 'Poppins', sans-serif;
-  background: #f4f7fb;
-  margin: 0;
-  padding: 20px;
-}
-h1 {
-  text-align: center;
-  margin-bottom: 20px;
-}
-.order {
-  background: white;
-  border-radius: 10px;
-  padding: 15px;
-  margin-bottom: 15px;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-}
-.order h3 { margin: 0 0 10px; }
-.status {
-  margin: 10px 0;
-}
-select {
-  padding: 6px;
-  border-radius: 6px;
-}
-button {
-  padding: 6px 12px;
-  border: none;
-  border-radius: 6px;
-  background: #4caf50;
-  color: white;
-  cursor: pointer;
-}
-button:hover {
-  background: #45a049;
-}
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Xander | Admin Dashboard</title>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f4f7fc;
+      margin: 0; padding: 20px;
+    }
+    h1 { text-align: center; color: #333; }
+    table {
+      width: 100%; border-collapse: collapse; margin-top: 20px;
+      background: white; box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+    }
+    th, td {
+      padding: 12px; border-bottom: 1px solid #ddd; text-align: left;
+    }
+    th { background: #333; color: white; }
+    select, button {
+      padding: 5px 10px; margin-left: 5px;
+    }
+    .status {
+      font-weight: bold; padding: 5px 10px; border-radius: 6px;
+    }
+    .Processing { background: orange; color: white; }
+    .Shipped { background: dodgerblue; color: white; }
+    .Delivered { background: green; color: white; }
+  </style>
 </head>
 <body>
-
-<h1>📦 Xander Admin Panel</h1>
-<div id="ordersContainer"></div>
+  <h1>📦 Xander Admin Dashboard</h1>
+  <table>
+    <thead>
+      <tr>
+        <th>Customer</th>
+        <th>Items</th>
+        <th>Total ($)</th>
+        <th>Status</th>
+        <th>Update</th>
+      </tr>
+    </thead>
+    <tbody id="ordersTable"></tbody>
+  </table>
 
 <script>
-function loadOrders() {
-  let orders = JSON.parse(localStorage.getItem('pastOrders') || '[]');
-  const container = document.getElementById('ordersContainer');
-  container.innerHTML = '';
+  // 🔹 Your Firebase config (replace with your project values)
+  const firebaseConfig = {
+    apiKey: "YOUR_API_KEY",
+    authDomain: "YOUR_PROJECT.firebaseapp.com",
+    projectId: "YOUR_PROJECT",
+    storageBucket: "YOUR_PROJECT.appspot.com",
+    messagingSenderId: "123456789",
+    appId: "APP_ID"
+  };
 
-  if (!orders.length) {
-    container.innerHTML = "<p>No customer orders yet.</p>";
-    return;
-  }
+  // 🔹 Initialize Firebase
+  const app = firebase.initializeApp(firebaseConfig);
+  const db = firebase.firestore();
 
-  orders.forEach((order, index) => {
-    if (order.statusStep === undefined) order.statusStep = 0;
-    const div = document.createElement('div');
-    div.className = 'order';
-    div.innerHTML = `
-      <h3>${order.name} - $${order.price} (x${order.quantity || 1})</h3>
-      <p><b>Customer:</b> ${order.customerName || "Guest"}</p>
-      <div class="status">
-        <label for="status-${index}">Status:</label>
-        <select id="status-${index}">
-          <option value="0" ${order.statusStep==0?"selected":""}>Processing</option>
-          <option value="1" ${order.statusStep==1?"selected":""}>Shipped</option>
-          <option value="2" ${order.statusStep==2?"selected":""}>Delivered</option>
-        </select>
-      </div>
-      <button onclick="updateOrder(${index})">Update</button>
-    `;
-    container.appendChild(div);
+  // 🔹 Listen for orders in realtime
+  db.collection("orders").onSnapshot(snapshot => {
+    const table = document.getElementById("ordersTable");
+    table.innerHTML = "";
+    snapshot.forEach(doc => {
+      const order = doc.data();
+      const tr = document.createElement("tr");
+
+      // Items list
+      const itemsList = order.items.map(i => `${i.name} (x${i.quantity})`).join(", ");
+
+      tr.innerHTML = `
+        <td>${order.customer || "Guest"}</td>
+        <td>${itemsList}</td>
+        <td>${order.total}</td>
+        <td><span class="status ${order.status}">${order.status}</span></td>
+        <td>
+          <select id="status-${doc.id}">
+            <option ${order.status==="Processing"?"selected":""}>Processing</option>
+            <option ${order.status==="Shipped"?"selected":""}>Shipped</option>
+            <option ${order.status==="Delivered"?"selected":""}>Delivered</option>
+          </select>
+          <button onclick="updateStatus('${doc.id}')">Update</button>
+        </td>
+      `;
+      table.appendChild(tr);
+    });
   });
-}
 
-function updateOrder(index) {
-  let orders = JSON.parse(localStorage.getItem('pastOrders') || '[]');
-  const newStep = parseInt(document.getElementById(`status-${index}`).value);
-  orders[index].statusStep = newStep;
-  localStorage.setItem('pastOrders', JSON.stringify(orders));
-  alert("✅ Order updated! Customers will see it in Track Orders.");
-}
-
-loadOrders();
+  // 🔹 Update status in Firestore
+  function updateStatus(orderId){
+    const newStatus = document.getElementById(`status-${orderId}`).value;
+    db.collection("orders").doc(orderId).update({ status: newStatus });
+  }
 </script>
-
 </body>
 </html>
