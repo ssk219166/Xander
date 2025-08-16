@@ -55,9 +55,6 @@
 <p>Don't have an account? <a href="signup.html">Sign Up</a></p>
 
 <script type="module">
-import { auth } from './firebase-config.js';
-import { signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
-
 const form = document.getElementById('signinForm');
 form.addEventListener('submit', async e=>{
   e.preventDefault();
@@ -77,3 +74,4 @@ form.addEventListener('submit', async e=>{
 </script>
 </body>
 </html>
+
