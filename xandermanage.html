@@ -39,6 +39,13 @@ button:hover{ background:#45a049; }
 button:active{ transform:translateY(1px); }
 button[disabled]{ opacity:.45; cursor:not-allowed; }
 
+.details{
+  font-size:0.9rem; color:#444; margin:10px 0; line-height:1.4;
+  background:#f9f9f9; border-radius:10px; padding:10px;
+}
+.details strong{ color:#222; }
+
+/* Status pill */
 .status-line{ font-size:.9rem; color:#444; margin-bottom:10px; }
 .status-pill{
   display:inline-block; padding:4px 10px; border-radius:999px; font-size:.8rem; font-weight:600; color:#fff;
@@ -60,13 +67,6 @@ button[disabled]{ opacity:.45; cursor:not-allowed; }
 }
 .step.active .circle{ background:#4caf50; transform:scale(1.1); box-shadow:0 0 10px rgba(76,175,80,.8); }
 .step .label{ font-size:12px; color:#555; }
-
-.order-details{
-  font-size:.9rem; color:#333; margin-bottom:10px;
-  background:#f7f7f7; border-radius:10px; padding:10px 12px;
-}
-.order-details p{ margin:4px 0; }
-.order-details strong{ color:#000; }
 </style>
 </head>
 <body>
@@ -93,6 +93,10 @@ function loadOrdersForAdmin(){
 
   orders.forEach((order, index) => {
     if(order.statusStep === undefined) order.statusStep = 0;
+    if(!order.orderDate){ 
+      order.orderDate = new Date().toLocaleString(); // fallback if missing
+    }
+
     const totalCash = (order.price * (order.quantity || 1)).toFixed(2);
 
     const card = document.createElement('div');
@@ -100,7 +104,7 @@ function loadOrdersForAdmin(){
     card.innerHTML = `
       <div class="order-header">
         <div class="order-title">
-          Order #${index+1}
+          <strong>Order #${index+1}</strong>
         </div>
         <div class="controls">
           <button id="prev-${index}">Previous</button>
@@ -108,16 +112,18 @@ function loadOrdersForAdmin(){
         </div>
       </div>
 
-      <div class="order-details">
-        <p><strong>Customer:</strong> ${order.customerName || "Unknown"}</p>
+      <div class="details">
+        <p><strong>Customer:</strong> ${order.customerName || "Customer"}</p>
         <p><strong>Item:</strong> ${order.name}</p>
         <p><strong>Quantity:</strong> ${order.quantity || 1}</p>
-        <p><strong>Price:</strong> $${order.price}</p>
+        <p><strong>Price per item:</strong> $${order.price}</p>
         <p><strong>Total Cash:</strong> $${totalCash}</p>
+        <p><strong>Order Date:</strong> ${order.orderDate}</p>
       </div>
 
       <div class="status-line">
-        Status: <span id="status-pill-${index}" class="status-pill">—</span>
+        Status:
+        <span id="status-pill-${index}" class="status-pill">—</span>
       </div>
 
       <div class="progress-container">
@@ -147,10 +153,11 @@ function loadOrdersForAdmin(){
   });
 }
 
-// Render progress + status
+// Render progress + status for a single order (no timers; CSS handles animation)
 function renderProgress(orderIndex, step){
   const progressBar = document.getElementById(`progress-${orderIndex}`);
   const pill = document.getElementById(`status-pill-${orderIndex}`);
+
   pill.textContent = STEP_LABELS[step] || STEP_LABELS[0];
   pill.className = `status-pill status-${step}`;
 
@@ -159,6 +166,7 @@ function renderProgress(orderIndex, step){
     if(i<=step) circle.parentElement.classList.add('active');
     else circle.parentElement.classList.remove('active');
   }
+
   progressBar.style.width = (step/2 * 100) + '%';
 
   const prevBtn = document.getElementById(`prev-${orderIndex}`);
@@ -167,6 +175,7 @@ function renderProgress(orderIndex, step){
   if(nextBtn) nextBtn.disabled = step >= 2;
 }
 
+// Change step and persist
 function changeStep(orderIndex, delta){
   const orders = getOrders();
   const order = orders[orderIndex];
