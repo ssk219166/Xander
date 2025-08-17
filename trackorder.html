@@ -115,6 +115,45 @@ h2 { text-align: center; margin-bottom: 30px; color: white; }
   to { box-shadow: 0 0 20px rgba(76,175,80,1); transform: scale(1.25); }
 }
 .step .label { font-size: 12px; color: #555; }
+
+/* ✅ Checkmark Animation */
+.checkmark {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  display: block;
+  stroke-width: 3;
+  stroke: #4caf50;
+  stroke-miterlimit: 10;
+  margin: 10px auto;
+  box-shadow: inset 0px 0px 0px #4caf50;
+  animation: fill .4s ease-in-out .4s forwards, scale .3s ease-in-out .9s both;
+}
+.checkmark__circle {
+  stroke-dasharray: 166;
+  stroke-dashoffset: 166;
+  stroke-width: 3;
+  stroke-miterlimit: 10;
+  stroke: #4caf50;
+  fill: none;
+  animation: stroke 0.6s cubic-bezier(.65,.05,.36,1) forwards;
+}
+.checkmark__check {
+  transform-origin: 50% 50%;
+  stroke-dasharray: 48;
+  stroke-dashoffset: 48;
+  animation: stroke 0.3s cubic-bezier(.65,.05,.36,1) 0.7s forwards;
+}
+@keyframes stroke {
+  100% { stroke-dashoffset: 0; }
+}
+@keyframes scale {
+  0%, 100% { transform: none; }
+  50% { transform: scale3d(1.1, 1.1, 1); }
+}
+@keyframes fill {
+  100% { box-shadow: inset 0px 0px 0px 30px #4caf50; }
+}
 </style>
 </head>
 <body>
@@ -133,6 +172,9 @@ h2 { text-align: center; margin-bottom: 30px; color: white; }
   <h2>Track My Orders</h2>
   <div id="ordersContainer"></div>
 </main>
+
+<!-- 🎊 Confetti JS -->
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
 
 <script>
 function loadOrders() {
@@ -170,6 +212,7 @@ function loadOrders() {
           <div class="label">Delivered</div>
         </div>
       </div>
+      <div id="delivered-animation-${index}" style="text-align:center; display:none;"></div>
     `;
     container.appendChild(div);
     updateUI(index, order.statusStep);
@@ -193,6 +236,24 @@ function updateUI(orderIndex, step) {
     else circle.classList.remove('active');
   }
   progressBar.style.width = `${(step / 2) * 100}%`;
+
+  // ✅ Special animation when Delivered
+  if (step === 2) {
+    const animBox = document.getElementById(`delivered-animation-${orderIndex}`);
+    animBox.style.display = "block";
+    animBox.innerHTML = `
+      <svg class="checkmark" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 52 52">
+        <circle class="checkmark__circle" cx="26" cy="26" r="25" fill="none"/>
+        <path class="checkmark__check" fill="none" d="M14 27l7 7 16-16"/>
+      </svg>
+    `;
+    // 🎊 Fire confetti once
+    confetti({
+      particleCount: 100,
+      spread: 70,
+      origin: { y: 0.6 }
+    });
+  }
 }
 
 window.addEventListener('storage', function(event) {
