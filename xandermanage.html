@@ -76,20 +76,33 @@ button[disabled]{ opacity:.45; cursor:not-allowed; }
 
 <script>
 const STEP_LABELS = ["Processing","Shipped","Delivered"];
+const API_URL = "https://your-server-url.com"; // <-- Replace with your deployed server URL
 
-// Fetch orders from localStorage
-function getOrders(){ 
-  return JSON.parse(localStorage.getItem('pastOrders') || '[]'); 
+// Fetch orders from server
+async function getOrders(){
+  try {
+    const res = await fetch(`${API_URL}/orders`);
+    return await res.json();
+  } catch(e) { 
+    console.error("Failed to fetch orders", e);
+    return [];
+  }
 }
 
-// Save orders to localStorage
-function setOrders(orders){ 
-  localStorage.setItem('pastOrders', JSON.stringify(orders)); 
+// Update order status on server
+async function updateOrder(orderId, statusStep){
+  try {
+    await fetch(`${API_URL}/orders/${orderId}`, {
+      method:'PUT',
+      headers:{ 'Content-Type':'application/json' },
+      body: JSON.stringify({ statusStep })
+    });
+  } catch(e) { console.error("Failed to update order", e); }
 }
 
 // Load and render all orders
-function loadOrdersForAdmin(){
-  const orders = getOrders();
+async function loadOrdersForAdmin(){
+  const orders = await getOrders();
   const container = document.getElementById('adminOrdersContainer');
   container.innerHTML = '';
 
@@ -99,19 +112,15 @@ function loadOrdersForAdmin(){
   }
 
   orders.forEach((order, index) => {
-    if(order.statusStep === undefined) order.statusStep = 0;
-    if(!order.orderDate) order.orderDate = new Date().toLocaleString();
-
     const totalCash = (order.price * (order.quantity || 1)).toFixed(2);
-
     const card = document.createElement('div');
     card.className = 'order-card';
     card.innerHTML = `
       <div class="order-header">
         <div class="order-title"><strong>Order #${index+1}</strong></div>
         <div class="controls">
-          <button id="prev-${index}">Previous</button>
-          <button id="next-${index}">Next</button>
+          <button id="prev-${order.id}">Previous</button>
+          <button id="next-${order.id}">Next</button>
         </div>
       </div>
 
@@ -125,81 +134,68 @@ function loadOrdersForAdmin(){
       </div>
 
       <div class="status-line">
-        Status: <span id="status-pill-${index}" class="status-pill">—</span>
+        Status: <span id="status-pill-${order.id}" class="status-pill">—</span>
       </div>
 
       <div class="progress-container">
-        <div class="progress" id="progress-${index}"></div>
+        <div class="progress" id="progress-${order.id}"></div>
         <div class="step" style="left:0%">
-          <div class="circle" id="circle-${index}-0">1</div>
+          <div class="circle" id="circle-${order.id}-0">1</div>
           <div class="label">Processing</div>
         </div>
         <div class="step" style="left:50%">
-          <div class="circle" id="circle-${index}-1">2</div>
+          <div class="circle" id="circle-${order.id}-1">2</div>
           <div class="label">Shipped</div>
         </div>
         <div class="step" style="left:100%">
-          <div class="circle" id="circle-${index}-2">3</div>
+          <div class="circle" id="circle-${order.id}-2">3</div>
           <div class="label">Delivered</div>
         </div>
       </div>
     `;
     container.appendChild(card);
 
-    document.getElementById(`prev-${index}`).addEventListener('click', () => changeStep(index, -1));
-    document.getElementById(`next-${index}`).addEventListener('click', () => changeStep(index, +1));
+    document.getElementById(`prev-${order.id}`).addEventListener('click', async () => changeStep(order.id, -1));
+    document.getElementById(`next-${order.id}`).addEventListener('click', async () => changeStep(order.id, +1));
 
-    renderProgress(index, order.statusStep);
+    renderProgress(order.id, order.statusStep);
   });
 }
 
-// Render progress bar and status
-function renderProgress(orderIndex, step){
-  const progressBar = document.getElementById(`progress-${orderIndex}`);
-  const pill = document.getElementById(`status-pill-${orderIndex}`);
-
+// Render progress bar
+function renderProgress(orderId, step){
+  const progressBar = document.getElementById(`progress-${orderId}`);
+  const pill = document.getElementById(`status-pill-${orderId}`);
   pill.textContent = STEP_LABELS[step] || STEP_LABELS[0];
   pill.className = `status-pill status-${step}`;
-
   for(let i=0;i<=2;i++){
-    const circle = document.getElementById(`circle-${orderIndex}-${i}`);
+    const circle = document.getElementById(`circle-${orderId}-${i}`);
     if(i<=step) circle.parentElement.classList.add('active');
     else circle.parentElement.classList.remove('active');
   }
-
   progressBar.style.width = (step/2 * 100) + '%';
 
-  const prevBtn = document.getElementById(`prev-${orderIndex}`);
-  const nextBtn = document.getElementById(`next-${orderIndex}`);
+  const prevBtn = document.getElementById(`prev-${orderId}`);
+  const nextBtn = document.getElementById(`next-${orderId}`);
   if(prevBtn) prevBtn.disabled = step <= 0;
   if(nextBtn) nextBtn.disabled = step >= 2;
 }
 
-// Update order step
-function changeStep(orderIndex, delta){
-  const orders = getOrders();
-  const order = orders[orderIndex];
+// Change step
+async function changeStep(orderId, delta){
+  const orders = await getOrders();
+  const order = orders.find(o => o.id === orderId);
   if(!order) return;
-
-  const nextStep = Math.max(0, Math.min(2, (order.statusStep ?? 0) + delta));
-  if(nextStep === order.statusStep){
-    renderProgress(orderIndex, nextStep);
-    return;
-  }
-
-  order.statusStep = nextStep;
-  orders[orderIndex] = order;
-  setOrders(orders);
-  renderProgress(orderIndex, nextStep);
+  const nextStep = Math.max(0, Math.min(2, order.statusStep + delta));
+  if(nextStep === order.statusStep) return;
+  await updateOrder(orderId, nextStep);
+  renderProgress(orderId, nextStep);
 }
 
-// Listen to storage changes to auto-refresh if other tabs change orders
-window.addEventListener('storage', e => {
-  if(e.key === 'pastOrders') loadOrdersForAdmin();
-});
+// Auto-refresh every 5 seconds
+setInterval(loadOrdersForAdmin, 5000);
 
 loadOrdersForAdmin();
 </script>
-
 </body>
 </html>
