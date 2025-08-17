@@ -67,6 +67,38 @@ button[disabled]{ opacity:.45; cursor:not-allowed; }
 }
 .step.active .circle{ background:#4caf50; transform:scale(1.1); box-shadow:0 0 10px rgba(76,175,80,.8); }
 .step .label{ font-size:12px; color:#555; }
+
+/* ✅ Checkmark Animation */
+.checkmark {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  display: block;
+  stroke-width: 3;
+  stroke: #4caf50;
+  stroke-miterlimit: 10;
+  margin: 10px auto;
+  box-shadow: inset 0px 0px 0px #4caf50;
+  animation: fill .4s ease-in-out .4s forwards, scale .3s ease-in-out .9s both;
+}
+.checkmark__circle {
+  stroke-dasharray: 166;
+  stroke-dashoffset: 166;
+  stroke-width: 3;
+  stroke-miterlimit: 10;
+  stroke: #4caf50;
+  fill: none;
+  animation: stroke 0.6s cubic-bezier(.65,.05,.36,1) forwards;
+}
+.checkmark__check {
+  transform-origin: 50% 50%;
+  stroke-dasharray: 48;
+  stroke-dashoffset: 48;
+  animation: stroke 0.3s cubic-bezier(.65,.05,.36,1) 0.7s forwards;
+}
+@keyframes stroke { 100% { stroke-dashoffset: 0; } }
+@keyframes scale { 0%,100%{transform:none;} 50%{transform:scale3d(1.1,1.1,1);} }
+@keyframes fill { 100% { box-shadow: inset 0px 0px 0px 30px #4caf50; } }
 </style>
 </head>
 <body>
@@ -74,131 +106,121 @@ button[disabled]{ opacity:.45; cursor:not-allowed; }
 <h1>Admin Dashboard</h1>
 <div id="adminOrdersContainer"></div>
 
+<!-- 🎊 Confetti JS -->
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
+
 <script>
-// ---------- Shared helpers ----------
 const STEP_LABELS = ["Processing","Shipped","Delivered"];
 function getOrders(){ return JSON.parse(localStorage.getItem('pastOrders') || '[]'); }
 function setOrders(orders){ localStorage.setItem('pastOrders', JSON.stringify(orders)); }
+function getUserProfile(){ return JSON.parse(localStorage.getItem('userProfile') || '{}'); }
 
-// ---------- Rendering ----------
 function loadOrdersForAdmin(){
   const orders = getOrders();
   const container = document.getElementById('adminOrdersContainer');
   container.innerHTML = '';
-
   if(!orders.length){
     container.innerHTML = "<p style='text-align:center;color:#fff;'>No orders yet.</p>";
     return;
   }
+  const profile = getUserProfile();
 
-  orders.forEach((order, index) => {
-    if(order.statusStep === undefined) order.statusStep = 0;
-    if(!order.orderDate){ 
-      order.orderDate = new Date().toLocaleString(); // fallback if missing
-    }
-
-    const totalCash = (order.price * (order.quantity || 1)).toFixed(2);
+  orders.forEach((order,index)=>{
+    if(order.statusStep===undefined) order.statusStep=0;
+    if(!order.orderDate) order.orderDate = new Date().toLocaleString();
+    if(!order.customerName && profile.name) order.customerName = profile.name;
+    const totalCash = (order.price*(order.quantity||1)).toFixed(2);
 
     const card = document.createElement('div');
-    card.className = 'order-card';
-    card.innerHTML = `
+    card.className='order-card';
+    card.innerHTML=`
       <div class="order-header">
-        <div class="order-title">
-          <strong>Order #${index+1}</strong>
-        </div>
+        <div class="order-title"><strong>Order #${index+1}</strong></div>
         <div class="controls">
           <button id="prev-${index}">Previous</button>
           <button id="next-${index}">Next</button>
         </div>
       </div>
-
       <div class="details">
-        <p><strong>Customer:</strong> ${order.customerName || "Customer"}</p>
+        <p><strong>Customer:</strong> ${order.customerName || "Unknown"}</p>
         <p><strong>Item:</strong> ${order.name}</p>
-        <p><strong>Quantity:</strong> ${order.quantity || 1}</p>
+        <p><strong>Quantity:</strong> ${order.quantity||1}</p>
         <p><strong>Price per item:</strong> $${order.price}</p>
         <p><strong>Total Cash:</strong> $${totalCash}</p>
         <p><strong>Order Date:</strong> ${order.orderDate}</p>
       </div>
-
       <div class="status-line">
-        Status:
-        <span id="status-pill-${index}" class="status-pill">—</span>
+        Status: <span id="status-pill-${index}" class="status-pill">—</span>
       </div>
-
       <div class="progress-container">
         <div class="progress" id="progress-${index}"></div>
-        <div class="step" style="left:0%">
-          <div class="circle" id="circle-${index}-0">1</div>
-          <div class="label">Processing</div>
-        </div>
-        <div class="step" style="left:50%">
-          <div class="circle" id="circle-${index}-1">2</div>
-          <div class="label">Shipped</div>
-        </div>
-        <div class="step" style="left:100%">
-          <div class="circle" id="circle-${index}-2">3</div>
-          <div class="label">Delivered</div>
-        </div>
+        <div class="step" style="left:0%"><div class="circle" id="circle-${index}-0">1</div><div class="label">Processing</div></div>
+        <div class="step" style="left:50%"><div class="circle" id="circle-${index}-1">2</div><div class="label">Shipped</div></div>
+        <div class="step" style="left:100%"><div class="circle" id="circle-${index}-2">3</div><div class="label">Delivered</div></div>
       </div>
+      <div id="delivered-animation-${index}" style="text-align:center; display:none;"></div>
     `;
     container.appendChild(card);
 
-    // Wire buttons
-    document.getElementById(`prev-${index}`).addEventListener('click', () => changeStep(index, -1));
-    document.getElementById(`next-${index}`).addEventListener('click', () => changeStep(index, +1));
+    document.getElementById(`prev-${index}`).addEventListener('click',()=>changeStep(index,-1));
+    document.getElementById(`next-${index}`).addEventListener('click',()=>changeStep(index,+1));
 
-    // Initial render
     renderProgress(index, order.statusStep);
   });
 }
 
-// Render progress + status for a single order (no timers; CSS handles animation)
 function renderProgress(orderIndex, step){
-  const progressBar = document.getElementById(`progress-${orderIndex}`);
-  const pill = document.getElementById(`status-pill-${orderIndex}`);
+  const progressBar=document.getElementById(`progress-${orderIndex}`);
+  const pill=document.getElementById(`status-pill-${orderIndex}`);
 
-  pill.textContent = STEP_LABELS[step] || STEP_LABELS[0];
-  pill.className = `status-pill status-${step}`;
+  pill.textContent = STEP_LABELS[step]||STEP_LABELS[0];
+  pill.className=`status-pill status-${step}`;
 
   for(let i=0;i<=2;i++){
-    const circle = document.getElementById(`circle-${orderIndex}-${i}`);
+    const circle=document.getElementById(`circle-${orderIndex}-${i}`);
     if(i<=step) circle.parentElement.classList.add('active');
     else circle.parentElement.classList.remove('active');
   }
 
-  progressBar.style.width = (step/2 * 100) + '%';
+  progressBar.style.width = (step/2*100)+'%';
 
-  const prevBtn = document.getElementById(`prev-${orderIndex}`);
-  const nextBtn = document.getElementById(`next-${orderIndex}`);
-  if(prevBtn) prevBtn.disabled = step <= 0;
-  if(nextBtn) nextBtn.disabled = step >= 2;
-}
+  const prevBtn=document.getElementById(`prev-${orderIndex}`);
+  const nextBtn=document.getElementById(`next-${orderIndex}`);
+  if(prevBtn) prevBtn.disabled = step<=0;
+  if(nextBtn) nextBtn.disabled = step>=2;
 
-// Change step and persist
-function changeStep(orderIndex, delta){
-  const orders = getOrders();
-  const order = orders[orderIndex];
-  if(!order) return;
-
-  const nextStep = Math.max(0, Math.min(2, (order.statusStep ?? 0) + delta));
-  if(nextStep === order.statusStep) {
-    renderProgress(orderIndex, nextStep);
-    return;
+  // ✅ Checkmark + Confetti when Delivered
+  const animBox=document.getElementById(`delivered-animation-${orderIndex}`);
+  if(step===2){
+    animBox.style.display="block";
+    animBox.innerHTML = `
+      <svg class="checkmark" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 52 52">
+        <circle class="checkmark__circle" cx="26" cy="26" r="25" fill="none"/>
+        <path class="checkmark__check" fill="none" d="M14 27l7 7 16-16"/>
+      </svg>
+    `;
+    confetti({particleCount:100,spread:70,origin:{y:0.6}});
+  } else {
+    animBox.style.display="none";
+    animBox.innerHTML='';
   }
-
-  order.statusStep = nextStep;
-  orders[orderIndex] = order;
-  setOrders(orders);
-  renderProgress(orderIndex, nextStep);
 }
 
-window.addEventListener('storage', (e) => {
-  if(e.key === 'pastOrders') loadOrdersForAdmin();
-});
+function changeStep(orderIndex,delta){
+  const orders=getOrders();
+  const order=orders[orderIndex];
+  if(!order) return;
+  const nextStep=Math.max(0,Math.min(2,(order.statusStep??0)+delta));
+  if(nextStep===order.statusStep){ renderProgress(orderIndex,nextStep); return; }
+  order.statusStep=nextStep;
+  orders[orderIndex]=order;
+  setOrders(orders);
+  renderProgress(orderIndex,nextStep);
+}
+
+window.addEventListener('storage',(e)=>{ if(e.key==='pastOrders') loadOrdersForAdmin(); });
 
 loadOrdersForAdmin();
 </script>
-
 </body>
 </html>
