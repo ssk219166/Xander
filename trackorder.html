@@ -40,13 +40,21 @@ nav a::after {
 nav a:hover::after { width: 100%; }
 main { padding: 30px; max-width: 900px; margin: auto; }
 h2 { text-align: center; margin-bottom: 30px; color: white; }
+
 .order-card {
   background: rgba(255,255,255,0.9);
   border-radius: 15px;
   padding: 20px;
   margin-bottom: 25px;
   box-shadow: 0 6px 15px rgba(0,0,0,0.2);
+  opacity: 0;
+  transform: translateY(30px);
+  animation: cardIn 0.8s ease forwards;
 }
+@keyframes cardIn {
+  to { opacity: 1; transform: translateY(0); }
+}
+
 .order-header {
   display: flex;
   justify-content: space-between;
@@ -54,6 +62,14 @@ h2 { text-align: center; margin-bottom: 30px; color: white; }
   margin-bottom: 15px;
 }
 .order-header h3 { font-size: 1.2rem; color: #333; }
+.status-text {
+  opacity: 0;
+  animation: fadeIn 0.5s forwards;
+}
+@keyframes fadeIn {
+  to { opacity: 1; }
+}
+
 .progress-container {
   position: relative;
   height: 6px;
@@ -66,7 +82,7 @@ h2 { text-align: center; margin-bottom: 30px; color: white; }
   background: linear-gradient(90deg, #4caf50, #2ecc71);
   border-radius: 3px;
   width: 0;
-  transition: width 0.5s ease-in-out;
+  transition: width 1s ease-in-out;
 }
 .step {
   position: absolute;
@@ -90,8 +106,13 @@ h2 { text-align: center; margin-bottom: 30px; color: white; }
 }
 .step.active .circle {
   background: #4caf50;
-  transform: scale(1.1);
-  box-shadow: 0 0 10px rgba(76,175,80,0.8);
+  transform: scale(1.2);
+  box-shadow: 0 0 15px rgba(76,175,80,0.9);
+  animation: pulse 1.2s infinite alternate;
+}
+@keyframes pulse {
+  from { box-shadow: 0 0 8px rgba(76,175,80,0.7); transform: scale(1.1); }
+  to { box-shadow: 0 0 20px rgba(76,175,80,1); transform: scale(1.25); }
 }
 .step .label { font-size: 12px; color: #555; }
 </style>
@@ -126,13 +147,13 @@ function loadOrders() {
 
   orders.forEach((order, index) => {
     if (order.statusStep === undefined) order.statusStep = 0;
-
     const div = document.createElement('div');
     div.className = 'order-card';
+    div.style.animationDelay = `${index * 0.2}s`; // staggered entrance
     div.innerHTML = `
       <div class="order-header">
         <h3>${order.name} - $${order.price} (x${order.quantity || 1})</h3>
-        <span>Status: <b id="status-${index}">Processing</b></span>
+        <span>Status: <b id="status-${index}" class="status-text">Processing</b></span>
       </div>
       <div class="progress-container">
         <div class="progress" id="progress-${index}"></div>
@@ -159,39 +180,25 @@ function updateUI(orderIndex, step) {
   const steps = ["Processing", "Shipped", "Delivered"];
   const progressBar = document.getElementById(`progress-${orderIndex}`);
   const statusLabel = document.getElementById(`status-${orderIndex}`);
-  statusLabel.textContent = steps[step] || "Processing";
 
-  // Animate circles gradually
+  statusLabel.style.opacity = "0";
+  setTimeout(() => {
+    statusLabel.textContent = steps[step] || "Processing";
+    statusLabel.style.opacity = "1";
+  }, 200);
+
   for (let i = 0; i <= 2; i++) {
     const circle = document.getElementById(`circle-${orderIndex}-${i}`);
-    if (i <= step) {
-      setTimeout(() => circle.classList.add('active'), i * 300); // staggered effect
-    } else {
-      circle.classList.remove('active');
-    }
+    if (i <= step) circle.classList.add('active');
+    else circle.classList.remove('active');
   }
-
-  // Smooth progress bar animation
-  const targetWidth = (step / 2) * 100;
-  let currentWidth = parseFloat(progressBar.style.width) || 0;
-  const stepsCount = 20;
-  const stepSize = (targetWidth - currentWidth) / stepsCount;
-  let counter = 0;
-
-  const animate = setInterval(() => {
-    currentWidth += stepSize;
-    progressBar.style.width = currentWidth + '%';
-    counter++;
-    if (counter >= stepsCount) clearInterval(animate);
-  }, 20);
+  progressBar.style.width = `${(step / 2) * 100}%`;
 }
 
-// Update automatically when localStorage changes (e.g., admin updates)
 window.addEventListener('storage', function(event) {
   if (event.key === 'pastOrders') loadOrders();
 });
 
-// Initial load
 loadOrders();
 </script>
 
