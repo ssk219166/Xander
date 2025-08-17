@@ -1,204 +1,206 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Xander | Track Orders</title>
-  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
-  <style>
-    body {
-      font-family: 'Poppins', sans-serif;
-      background: #f0f2f5;
-      margin: 0;
-      padding: 20px;
-    }
-    h1 {
-      text-align: center;
-      margin-bottom: 30px;
-    }
-    .order {
-      background: #fff;
-      padding: 20px;
-      margin: 15px auto;
-      border-radius: 12px;
-      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-      max-width: 600px;
-    }
-    .progress-container {
-      position: relative;
-      height: 8px;
-      background: #ddd;
-      border-radius: 5px;
-      margin: 30px 0 20px;
-      overflow: hidden;
-    }
-    .progress-bar {
-      height: 8px;
-      width: 0%;
-      background: linear-gradient(90deg, #4cafef, #00c853);
-      border-radius: 5px;
-      transition: width 0.6s ease;
-    }
-    .circle-container {
-      display: flex;
-      justify-content: space-between;
-      margin-top: -16px;
-      position: relative;
-    }
-    .circle {
-      width: 26px;
-      height: 26px;
-      background: #ddd;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: background 0.4s ease, transform 0.4s ease;
-    }
-    .circle.active {
-      background: #4cafef;
-      transform: scale(1.2);
-    }
-    /* Status text animation */
-    .status-text {
-      display: inline-block;
-      opacity: 0;
-      transform: translateY(-10px);
-      transition: opacity 0.5s ease, transform 0.5s ease;
-    }
-    .status-text.show {
-      opacity: 1;
-      transform: translateY(0);
-    }
-    /* Delivered checkmark */
-    .checkmark {
-      width: 60px;
-      height: 60px;
-      stroke-width: 4;
-      stroke: #4caf50;
-      stroke-miterlimit: 10;
-      box-shadow: inset 0px 0px 0px #4caf50;
-      border-radius: 50%;
-      display: block;
-      margin: 20px auto;
-      animation: fill .4s ease-in-out .4s forwards, scale .3s ease-in-out .9s both;
-    }
-    .checkmark__circle {
-      stroke-dasharray: 166;
-      stroke-dashoffset: 166;
-      stroke-width: 4;
-      stroke-miterlimit: 10;
-      stroke: #4caf50;
-      fill: none;
-      animation: stroke .6s cubic-bezier(.65, 0, .45, 1) forwards;
-    }
-    .checkmark__check {
-      transform-origin: 50% 50%;
-      stroke-dasharray: 48;
-      stroke-dashoffset: 48;
-      animation: stroke .3s cubic-bezier(.65, 0, .45, 1) .8s forwards;
-    }
-    @keyframes stroke {
-      100% { stroke-dashoffset: 0; }
-    }
-    @keyframes scale {
-      0%, 100% { transform: none; }
-      50% { transform: scale3d(1.1, 1.1, 1); }
-    }
-    @keyframes fill {
-      100% { box-shadow: inset 0px 0px 0px 30px #4caf50; }
-    }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Xander | Track Orders</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; }
+body {
+  background: linear-gradient(270deg, #ff758c, #ff7eb3, #9face6);
+  background-size: 600% 600%;
+  animation: gradientBG 15s ease infinite;
+  color: #333;
+  min-height: 100vh;
+}
+@keyframes gradientBG {
+  0% { background-position: 0% 50% }
+  50% { background-position: 100% 50% }
+  100% { background-position: 0% 50% }
+}
+header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px 40px;
+  background: rgba(0,0,0,0.4);
+  backdrop-filter: blur(10px);
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  color: white;
+}
+header h1 { font-size: 1.8rem; font-weight: 700; }
+nav a { margin: 0 15px; text-decoration: none; color: #fff; font-weight: 500; position: relative; }
+nav a::after {
+  content: ''; position: absolute; width: 0; height: 2px; bottom: -5px; left: 0;
+  background: #fff; transition: width 0.3s;
+}
+nav a:hover::after { width: 100%; }
+main { padding: 30px; max-width: 900px; margin: auto; }
+h2 { text-align: center; margin-bottom: 30px; color: white; }
+
+.order-card {
+  background: rgba(255,255,255,0.9);
+  border-radius: 15px;
+  padding: 20px;
+  margin-bottom: 25px;
+  box-shadow: 0 6px 15px rgba(0,0,0,0.2);
+  opacity: 0;
+  transform: translateY(30px);
+  animation: cardIn 0.8s ease forwards;
+}
+@keyframes cardIn {
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.order-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+}
+.order-header h3 { font-size: 1.2rem; color: #333; }
+.status-text {
+  opacity: 0;
+  animation: fadeIn 0.5s forwards;
+}
+@keyframes fadeIn {
+  to { opacity: 1; }
+}
+
+.progress-container {
+  position: relative;
+  height: 6px;
+  background: #ddd;
+  border-radius: 3px;
+  margin: 20px 0;
+}
+.progress {
+  height: 6px;
+  background: linear-gradient(90deg, #4caf50, #2ecc71);
+  border-radius: 3px;
+  width: 0;
+  transition: width 1s ease-in-out;
+}
+.step {
+  position: absolute;
+  top: -20px;
+  transform: translateX(-50%);
+  text-align: center;
+  width: 80px;
+}
+.step .circle {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: #bbb;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 5px;
+  font-size: 12px;
+  transition: background 0.5s ease-in-out, transform 0.3s;
+}
+.step.active .circle {
+  background: #4caf50;
+  transform: scale(1.2);
+  box-shadow: 0 0 15px rgba(76,175,80,0.9);
+  animation: pulse 1.2s infinite alternate;
+}
+@keyframes pulse {
+  from { box-shadow: 0 0 8px rgba(76,175,80,0.7); transform: scale(1.1); }
+  to { box-shadow: 0 0 20px rgba(76,175,80,1); transform: scale(1.25); }
+}
+.step .label { font-size: 12px; color: #555; }
+</style>
 </head>
 <body>
 
-  <h1>Track Your Orders</h1>
-  <div id="orders"></div>
+<header>
+  <h1>Xander</h1>
+  <nav>
+    <a href="index.html">Home</a>
+    <a href="shop.html">Shop</a>
+    <a href="cart.html">Cart</a>
+    <a href="profile.html">Profile</a>
+  </nav>
+</header>
 
-  <script>
-    // Load orders from localStorage
-    let orders = JSON.parse(localStorage.getItem("orders")) || [];
+<main>
+  <h2>Track My Orders</h2>
+  <div id="ordersContainer"></div>
+</main>
 
-    // Render orders
-    function renderOrders() {
-      const container = document.getElementById("orders");
-      container.innerHTML = "";
+<script>
+function loadOrders() {
+  let orders = JSON.parse(localStorage.getItem('pastOrders') || '[]');
+  const container = document.getElementById('ordersContainer');
+  container.innerHTML = '';
 
-      if (orders.length === 0) {
-        container.innerHTML = "<p style='text-align:center'>No orders yet.</p>";
-        return;
-      }
+  if (!orders.length) {
+    container.innerHTML = "<p style='color:white; text-align:center;'>No orders yet.</p>";
+    return;
+  }
 
-      orders.forEach((order, index) => {
-        container.innerHTML += `
-          <div class="order">
-            <h3>Order #${index + 1}</h3>
-            <p>Item: ${order.item}</p>
-            <p>Status: <span id="status-${index}" class="status-text">Processing</span></p>
+  orders.forEach((order, index) => {
+    if (order.statusStep === undefined) order.statusStep = 0;
+    const div = document.createElement('div');
+    div.className = 'order-card';
+    div.style.animationDelay = `${index * 0.2}s`; // staggered entrance
+    div.innerHTML = `
+      <div class="order-header">
+        <h3>${order.name} - $${order.price} (x${order.quantity || 1})</h3>
+        <span>Status: <b id="status-${index}" class="status-text">Processing</b></span>
+      </div>
+      <div class="progress-container">
+        <div class="progress" id="progress-${index}"></div>
+        <div class="step" style="left:0%">
+          <div class="circle" id="circle-${index}-0">1</div>
+          <div class="label">Processing</div>
+        </div>
+        <div class="step" style="left:50%">
+          <div class="circle" id="circle-${index}-1">2</div>
+          <div class="label">Shipped</div>
+        </div>
+        <div class="step" style="left:100%">
+          <div class="circle" id="circle-${index}-2">3</div>
+          <div class="label">Delivered</div>
+        </div>
+      </div>
+    `;
+    container.appendChild(div);
+    updateUI(index, order.statusStep);
+  });
+}
 
-            <div class="progress-container">
-              <div class="progress-bar" id="progress-${index}"></div>
-            </div>
-            <div class="circle-container">
-              <div class="circle" id="circle-${index}-0">1</div>
-              <div class="circle" id="circle-${index}-1">2</div>
-              <div class="circle" id="circle-${index}-2">3</div>
-            </div>
-            <div id="delivered-animation-${index}" style="text-align:center; margin-top:20px;"></div>
-          </div>
-        `;
-        updateUI(index, order.step || 0);
-      });
-    }
+function updateUI(orderIndex, step) {
+  const steps = ["Processing", "Shipped", "Delivered"];
+  const progressBar = document.getElementById(`progress-${orderIndex}`);
+  const statusLabel = document.getElementById(`status-${orderIndex}`);
 
-    // Update UI with animation
-    function updateUI(orderIndex, step) {
-      const steps = ["Processing", "Shipped", "Delivered"];
-      const progressBar = document.getElementById(`progress-${orderIndex}`);
-      const statusLabel = document.getElementById(`status-${orderIndex}`);
+  statusLabel.style.opacity = "0";
+  setTimeout(() => {
+    statusLabel.textContent = steps[step] || "Processing";
+    statusLabel.style.opacity = "1";
+  }, 200);
 
-      // Animate status text
-      statusLabel.classList.remove("show");
-      setTimeout(() => {
-        statusLabel.textContent = steps[step] || "Processing";
-        statusLabel.classList.add("show");
-      }, 200);
+  for (let i = 0; i <= 2; i++) {
+    const circle = document.getElementById(`circle-${orderIndex}-${i}`);
+    if (i <= step) circle.classList.add('active');
+    else circle.classList.remove('active');
+  }
+  progressBar.style.width = `${(step / 2) * 100}%`;
+}
 
-      // Animate circles
-      for (let i = 0; i <= 2; i++) {
-        const circle = document.getElementById(`circle-${orderIndex}-${i}`);
-        if (i <= step) circle.classList.add("active");
-        else circle.classList.remove("active");
-      }
+window.addEventListener('storage', function(event) {
+  if (event.key === 'pastOrders') loadOrders();
+});
 
-      // Animate progress bar
-      progressBar.style.width = `${(step / 2) * 100}%`;
+loadOrders();
+</script>
 
-      // Delivered animation
-      if (step === 2) {
-        const animBox = document.getElementById(`delivered-animation-${orderIndex}`);
-        animBox.innerHTML = `
-          <svg class="checkmark" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 52 52">
-            <circle class="checkmark__circle" cx="26" cy="26" r="25" fill="none"/>
-            <path class="checkmark__check" fill="none" d="M14 27l7 7 16-16"/>
-          </svg>
-        `;
-        confetti({
-          particleCount: 100,
-          spread: 70,
-          origin: { y: 0.6 }
-        });
-      }
-    }
-
-    // Listen for updates from admin (localStorage sync)
-    window.addEventListener("storage", () => {
-      orders = JSON.parse(localStorage.getItem("orders")) || [];
-      renderOrders();
-    });
-
-    // First render
-    renderOrders();
-  </script>
 </body>
 </html>
