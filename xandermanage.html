@@ -60,6 +60,13 @@ button[disabled]{ opacity:.45; cursor:not-allowed; }
 }
 .step.active .circle{ background:#4caf50; transform:scale(1.1); box-shadow:0 0 10px rgba(76,175,80,.8); }
 .step .label{ font-size:12px; color:#555; }
+
+.order-details{
+  font-size:.9rem; color:#333; margin-bottom:10px;
+  background:#f7f7f7; border-radius:10px; padding:10px 12px;
+}
+.order-details p{ margin:4px 0; }
+.order-details strong{ color:#000; }
 </style>
 </head>
 <body>
@@ -86,13 +93,14 @@ function loadOrdersForAdmin(){
 
   orders.forEach((order, index) => {
     if(order.statusStep === undefined) order.statusStep = 0;
+    const totalCash = (order.price * (order.quantity || 1)).toFixed(2);
 
     const card = document.createElement('div');
     card.className = 'order-card';
     card.innerHTML = `
       <div class="order-header">
         <div class="order-title">
-          <strong>${order.customerName || "Customer"}</strong> — ${order.name} · $${order.price} · x${order.quantity || 1}
+          Order #${index+1}
         </div>
         <div class="controls">
           <button id="prev-${index}">Previous</button>
@@ -100,9 +108,16 @@ function loadOrdersForAdmin(){
         </div>
       </div>
 
+      <div class="order-details">
+        <p><strong>Customer:</strong> ${order.customerName || "Unknown"}</p>
+        <p><strong>Item:</strong> ${order.name}</p>
+        <p><strong>Quantity:</strong> ${order.quantity || 1}</p>
+        <p><strong>Price:</strong> $${order.price}</p>
+        <p><strong>Total Cash:</strong> $${totalCash}</p>
+      </div>
+
       <div class="status-line">
-        Status:
-        <span id="status-pill-${index}" class="status-pill">—</span>
+        Status: <span id="status-pill-${index}" class="status-pill">—</span>
       </div>
 
       <div class="progress-container">
@@ -132,33 +147,26 @@ function loadOrdersForAdmin(){
   });
 }
 
-// Render progress + status for a single order (no timers; CSS handles animation)
+// Render progress + status
 function renderProgress(orderIndex, step){
   const progressBar = document.getElementById(`progress-${orderIndex}`);
   const pill = document.getElementById(`status-pill-${orderIndex}`);
-
-  // Status pill
   pill.textContent = STEP_LABELS[step] || STEP_LABELS[0];
   pill.className = `status-pill status-${step}`;
 
-  // Circles
   for(let i=0;i<=2;i++){
     const circle = document.getElementById(`circle-${orderIndex}-${i}`);
     if(i<=step) circle.parentElement.classList.add('active');
     else circle.parentElement.classList.remove('active');
   }
-
-  // Progress width (animated by CSS transition)
   progressBar.style.width = (step/2 * 100) + '%';
 
-  // Enable/disable buttons at bounds
   const prevBtn = document.getElementById(`prev-${orderIndex}`);
   const nextBtn = document.getElementById(`next-${orderIndex}`);
   if(prevBtn) prevBtn.disabled = step <= 0;
   if(nextBtn) nextBtn.disabled = step >= 2;
 }
 
-// Change step by delta (-1 or +1), persist, and re-render that order
 function changeStep(orderIndex, delta){
   const orders = getOrders();
   const order = orders[orderIndex];
@@ -166,23 +174,20 @@ function changeStep(orderIndex, delta){
 
   const nextStep = Math.max(0, Math.min(2, (order.statusStep ?? 0) + delta));
   if(nextStep === order.statusStep) {
-    // no change, but make sure UI buttons reflect bounds
     renderProgress(orderIndex, nextStep);
     return;
   }
 
   order.statusStep = nextStep;
   orders[orderIndex] = order;
-  setOrders(orders);           // <-- triggers storage event in other tabs (e.g., Track Orders)
+  setOrders(orders);
   renderProgress(orderIndex, nextStep);
 }
 
-// Real-time sync if another tab changes orders
 window.addEventListener('storage', (e) => {
   if(e.key === 'pastOrders') loadOrdersForAdmin();
 });
 
-// Initial load
 loadOrdersForAdmin();
 </script>
 
