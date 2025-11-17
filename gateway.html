@@ -6,7 +6,6 @@
 <title>Xander | Payment Gateway</title>
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
 <style>
-/* Reset + Base */
 *{margin:0;padding:0;box-sizing:border-box;font-family:'Poppins',sans-serif;}
 body{
   background:linear-gradient(270deg,#ff758c,#ff7eb3,#9face6);
@@ -20,7 +19,6 @@ body{
   100%{background-position:0% 50%}
 }
 
-/* Header */
 header{
   display:flex;justify-content:space-between;align-items:center;
   padding:15px 40px;
@@ -37,57 +35,50 @@ nav a::after{
   background:#fff;transition:width 0.3s;
 }
 nav a:hover::after{width:100%;}
+
 .profile-btn{
   background:#fff;color:#333;border-radius:50%;width:40px;height:40px;
-  display:flex;align-items:center;justify-content:center;font-weight:bold;
-  cursor:pointer;box-shadow:0 4px 8px rgba(0,0,0,0.2);transition:transform 0.3s;
+  display:flex;align-items:center;justify-content:center;
+  font-weight:bold;cursor:pointer;
+  box-shadow:0 4px 8px rgba(0,0,0,0.2);
+  transition:transform 0.3s;
 }
 .profile-btn:hover{transform:scale(1.1);}
 
-/* Main */
 main{
-  padding:30px;max-width:700px;margin:30px auto;
-  background:rgba(255,255,255,0.1);backdrop-filter:blur(10px);
-  border-radius:15px;box-shadow:0 8px 20px rgba(0,0,0,0.3);
+  padding:30px;max-width:800px;margin:30px auto;
+  background:rgba(255,255,255,0.15);backdrop-filter:blur(10px);
+  border-radius:20px;box-shadow:0 8px 20px rgba(0,0,0,0.3);
 }
 h2{text-align:center;margin-bottom:20px;}
 
-/* Payment Options */
 .payment-option{
-  background:#fff;color:#333;padding:15px;border-radius:12px;
+  background:#fff;color:#333;padding:18px;border-radius:14px;
   margin:12px 0;cursor:pointer;
   display:flex;align-items:center;justify-content:space-between;
-  transition:0.3s; font-weight:500;
+  transition:0.3s; font-weight:600;
 }
-.payment-option:hover{background:#ffe6f0;transform:scale(1.02);}
-.payment-option.selected{border:2px solid #ff4081;background:#fff0f5;}
+.payment-option:hover{
+  background:#ffe6f0;transform:scale(1.02);
+}
+.payment-option.selected{
+  border:3px solid #ff2b78;background:#fff0f5;
+}
 
 button.pay-now{
-  width:100%;padding:15px;border:none;border-radius:25px;
-  background:#fff;color:#333;font-weight:600;font-size:1rem;
-  cursor:pointer;transition:0.3s;margin-top:20px;
+  width:100%;padding:15px;border:none;border-radius:30px;
+  background:#fff;color:#333;font-weight:700;font-size:1.1rem;
+  cursor:pointer;transition:0.3s;margin-top:25px;
 }
 button.pay-now:hover{background:#ffdfdf;}
 
-/* Confirmation */
 #confirmation{
-  margin-top:20px;text-align:center;display:none;
-  background:rgba(0,0,0,0.3);padding:15px;border-radius:10px;
+  margin-top:25px;text-align:center;display:none;
+  background:rgba(0,0,0,0.35);padding:20px;border-radius:15px;
 }
-#confirmation h3{margin-bottom:10px;color:#0f0;}
-
-/* Orders */
-#track-orders{margin-top:30px;}
-.order-item{
-  background:rgba(255,255,255,0.2);margin:10px 0;padding:15px;
-  border-radius:10px;display:flex;justify-content:space-between;align-items:center;
+#confirmation h3{
+  margin-bottom:10px;color:#00ff88;font-size:1.4rem;
 }
-.order-item span{font-weight:600;}
-.order-item button{
-  padding:6px 12px;border:none;border-radius:5px;
-  cursor:pointer;background:orange;color:#fff;transition:0.3s;
-}
-.order-item button:hover{background:red;}
 </style>
 </head>
 <body>
@@ -107,22 +98,37 @@ button.pay-now:hover{background:#ffdfdf;}
 </header>
 
 <main>
-  <h2>Choose Payment Method</h2>
+  <h2>Choose a Payment Method</h2>
 
+  <!-- BEST GLOBAL GATEWAYS -->
   <div class="payment-option" onclick="selectPayment(this,'PayPal')">
     <span>PayPal</span><span>🅿️</span>
   </div>
-  <div class="payment-option" onclick="selectPayment(this,'Debit/Credit Card')">
-    <span>Debit / Credit Card</span><span>💳</span>
+
+  <div class="payment-option" onclick="selectPayment(this,'Stripe')">
+    <span>Stripe (Card Payments)</span><span>💳</span>
   </div>
-  <div class="payment-option" onclick="selectPayment(this,'Net Banking')">
-    <span>Net Banking</span><span>🏦</span>
+
+  <div class="payment-option" onclick="selectPayment(this,'Apple/Google Pay')">
+    <span>Apple Pay / Google Pay</span><span>📱</span>
   </div>
+
+  <!-- SRI LANKA PAYMENT OPTION -->
+  <div class="payment-option" onclick="selectPayment(this,'EzyCash')">
+    <span>EZY Cash (Sri Lanka)</span><span>📲💰</span>
+  </div>
+
+  <!-- ADDITIONAL OPTIONS -->
+  <div class="payment-option" onclick="selectPayment(this,'Bank Transfer')">
+    <span>Direct Bank Transfer</span><span>🏦</span>
+  </div>
+
   <div class="payment-option" onclick="selectPayment(this,'Cash on Delivery')">
     <span>Cash on Delivery</span><span>💵</span>
   </div>
-  <div class="payment-option" onclick="selectPayment(this,'Other')">
-    <span>Other Options</span><span>💰</span>
+
+  <div class="payment-option" onclick="selectPayment(this,'Crypto')">
+    <span>Crypto Payment (USDT / BTC)</span><span>🪙</span>
   </div>
 
   <button class="pay-now" onclick="payNow()">Pay Now</button>
@@ -135,11 +141,14 @@ button.pay-now:hover{background:#ffdfdf;}
 </main>
 
 <script>
-// Profile initial & cart count
+
+// Profile Initials
 function loadProfileInitial(){
   const name = localStorage.getItem('username') || 'U';
   document.querySelector('.profile-btn').textContent = name.charAt(0).toUpperCase();
 }
+
+// Cart Count
 function updateCartCount(){
   const cart = JSON.parse(localStorage.getItem('cart') || '[]');
   document.getElementById('cart-count').textContent = `🛒 ${cart.length}`;
@@ -147,31 +156,38 @@ function updateCartCount(){
 loadProfileInitial();
 updateCartCount();
 
-// Payment selection
-let selectedPayment=null;
-function selectPayment(el,method){
-  selectedPayment=method;
-  document.querySelectorAll('.payment-option').forEach(item=>item.classList.remove('selected'));
+// Select Payment
+let selectedPayment = null;
+function selectPayment(el, method){
+  selectedPayment = method;
+  document.querySelectorAll('.payment-option').forEach(item => item.classList.remove('selected'));
   el.classList.add('selected');
 }
 
-// Pay Now function
+// Pay Now
 function payNow(){
-  if(!selectedPayment){ alert('Please select a payment method!'); return; }
-  const cart=JSON.parse(localStorage.getItem('cart')||'[]');
-  if(cart.length===0){ alert('Your cart is empty!'); return; }
+  if(!selectedPayment){
+    alert('Please select a payment method!');
+    return;
+  }
 
-  // Save to pastOrders
-  let pastOrders=JSON.parse(localStorage.getItem('pastOrders')||'[]');
-  pastOrders=pastOrders.concat(cart);
-  localStorage.setItem('pastOrders',JSON.stringify(pastOrders));
+  const cart = JSON.parse(localStorage.getItem('cart') || '[]');
+  if(cart.length === 0){
+    alert('Your cart is empty!');
+    return;
+  }
+
+  // Save order
+  let pastOrders = JSON.parse(localStorage.getItem('pastOrders') || '[]');
+  pastOrders = pastOrders.concat(cart);
+  localStorage.setItem('pastOrders', JSON.stringify(pastOrders));
 
   // Clear cart
-  localStorage.setItem('cart',JSON.stringify([]));
+  localStorage.setItem('cart', JSON.stringify([]));
   updateCartCount();
 
-  // Show confirmation
-  document.getElementById('confirmation').style.display='block';
+  // Confirmation
+  document.getElementById('confirmation').style.display = 'block';
 }
 </script>
 

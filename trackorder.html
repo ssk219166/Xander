@@ -1,189 +1,310 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Xander | Track Orders</title>
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Xander | Track Order & Admin Dashboard</title>
 <style>
-* { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; }
-body {
-  background: linear-gradient(270deg, #ff758c, #ff7eb3, #9face6);
-  background-size: 600% 600%;
-  animation: gradientBG 15s ease infinite;
-  color: #333;
-  min-height: 100vh;
-}
-@keyframes gradientBG {
-  0% { background-position: 0% 50% }
-  50% { background-position: 100% 50% }
-  100% { background-position: 0% 50% }
-}
-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 15px 40px;
-  background: rgba(0,0,0,0.4);
-  backdrop-filter: blur(10px);
-  position: sticky;
-  top: 0;
-  z-index: 1000;
-  color: white;
-}
-header h1 { font-size: 1.8rem; font-weight: 700; }
-nav a { margin: 0 15px; text-decoration: none; color: #fff; font-weight: 500; position: relative; }
-nav a::after {
-  content: ''; position: absolute; width: 0; height: 2px; bottom: -5px; left: 0;
-  background: #fff; transition: width 0.3s;
-}
-nav a:hover::after { width: 100%; }
-main { padding: 30px; max-width: 900px; margin: auto; }
-h2 { text-align: center; margin-bottom: 30px; color: white; }
-.order-card {
-  background: rgba(255,255,255,0.9);
-  border-radius: 15px;
-  padding: 20px;
-  margin-bottom: 25px;
-  box-shadow: 0 6px 15px rgba(0,0,0,0.2);
-}
-.order-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 15px;
-}
-.order-header h3 { font-size: 1.2rem; color: #333; }
-.progress-container {
-  position: relative;
-  height: 6px;
-  background: #ddd;
-  border-radius: 3px;
-  margin: 20px 0;
-}
-.progress {
-  height: 6px;
-  background: linear-gradient(90deg, #4caf50, #2ecc71);
-  border-radius: 3px;
-  width: 0;
-  transition: width 0.5s ease-in-out;
-}
-.step {
-  position: absolute;
-  top: -20px;
-  transform: translateX(-50%);
-  text-align: center;
-  width: 80px;
-}
-.step .circle{
-  width:24px; height:24px; border-radius:50%; background:#bbb; color:#fff; display:flex; align-items:center; justify-content:center;
-  margin:0 auto 5px; font-size:12px; transition:background .4s ease-in-out, transform .3s;
-}
-.step.active .circle {
-  background: #4caf50;
-  transform: scale(1.1);
-  box-shadow: 0 0 10px rgba(76,175,80,0.8);
-}
-.step .label { font-size: 12px; color: #555; }
+  body {
+    font-family: Arial, sans-serif;
+    background: #121212;
+    color: #fff;
+    padding: 20px;
+    min-height: 100vh;
+  }
+  h1 {
+    color: #ff4081;
+    margin-bottom: 20px;
+  }
+  section {
+    margin-bottom: 40px;
+  }
+  input[type="text"] {
+    padding: 10px;
+    border-radius: 8px;
+    border: none;
+    font-size: 16px;
+    background: #292929;
+    color: #fff;
+    width: 300px;
+    max-width: 100%;
+  }
+  button {
+    background: #ff4081;
+    border: none;
+    padding: 10px 18px;
+    border-radius: 8px;
+    color: #fff;
+    cursor: pointer;
+    font-weight: 700;
+    font-size: 16px;
+    margin-left: 10px;
+    transition: background 0.3s;
+  }
+  button:hover {
+    background: #ff1f6b;
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    background: #1f1f1f;
+    border-radius: 12px;
+    overflow: hidden;
+    margin-top: 20px;
+  }
+  thead {
+    background: #2a2a2a;
+  }
+  th, td {
+    padding: 14px 10px;
+    text-align: left;
+    border-bottom: 1px solid #333;
+  }
+  tr:hover {
+    background: #333;
+    cursor: pointer;
+  }
+  .status {
+    padding: 6px 12px;
+    border-radius: 9999px;
+    font-weight: 700;
+    display: inline-block;
+    font-size: 0.9rem;
+  }
+  .OrderPlaced { background: #ff9800; color: #111; }
+  .Packed { background: #2196f3; color: #fff; }
+  .Shipped { background: #3f51b5; color: #fff; }
+  .InTransit { background: #9c27b0; color: #fff; }
+  .Delivered { background: #4caf50; color: #111; }
+  .Cancelled { background: #f44336; color: #fff; }
+
+  #orderDetails, #trackOrderDetails {
+    background: #1f1f1f;
+    border-radius: 12px;
+    padding: 20px;
+    margin-top: 20px;
+  }
+  h3 {
+    color: #ff4081;
+    margin-top: 0;
+  }
+  .items-list {
+    margin-top: 12px;
+  }
+  .item {
+    border-bottom: 1px solid #333;
+    padding: 6px 0;
+  }
+  select {
+    margin-top: 12px;
+    padding: 10px;
+    border-radius: 8px;
+    border: none;
+    font-size: 16px;
+    background: #292929;
+    color: #fff;
+    width: 100%;
+    max-width: 300px;
+  }
+  button.save-btn {
+    margin-top: 16px;
+    padding: 14px;
+    width: 100%;
+    max-width: 300px;
+    border-radius: 8px;
+    border: none;
+    background: #ff4081;
+    color: #fff;
+    font-weight: 700;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background 0.3s;
+  }
+  button.save-btn:hover {
+    background: #ff1f6b;
+  }
+  .no-orders {
+    text-align: center;
+    padding: 40px;
+    color: #777;
+  }
+  #searchInput {
+    width: 300px;
+    max-width: 100%;
+    padding: 10px;
+    border-radius: 8px;
+    border: none;
+    background: #292929;
+    color: #fff;
+    margin-bottom: 10px;
+  }
 </style>
 </head>
 <body>
 
-<header>
-  <h1>Xander</h1>
-  <nav>
-    <a href="index.html">Home</a>
-    <a href="shop.html">Shop</a>
-    <a href="cart.html">Cart</a>
-    <a href="profile.html">Profile</a>
-  </nav>
-</header>
+<h1>Xander | Track Order & Admin Dashboard</h1>
 
-<main>
-  <h2>Track My Orders</h2>
-  <div id="ordersContainer"></div>
-</main>
+<!-- Customer Track Order Section -->
+<section>
+  <h2>Track Your Order</h2>
+  <input type="text" id="trackOrderInput" placeholder="Enter your Order ID" />
+  <button onclick="trackOrder()">Track</button>
+
+  <div id="trackOrderDetails" style="display:none;">
+    <h3>Order Status</h3>
+    <div id="trackOrderInfo"></div>
+  </div>
+</section>
+
+<hr style="margin: 40px 0; border-color: #444;">
+
 
 <script>
-function loadOrders() {
-  let orders = JSON.parse(localStorage.getItem('pastOrders') || '[]');
-  const container = document.getElementById('ordersContainer');
-  container.innerHTML = '';
+  // Load orders from localStorage
+  let allOrders = JSON.parse(localStorage.getItem('pastOrders') || '[]');
+  let selectedOrder = null;
 
-  if (!orders.length) {
-    container.innerHTML = "<p style='color:white; text-align:center;'>No orders yet.</p>";
-    return;
+  function formatDate(dateStr) {
+    return new Date(dateStr).toLocaleString();
   }
 
-  orders.forEach((order, index) => {
-    if (order.statusStep === undefined) order.statusStep = 0;
+  function statusClass(status) {
+    return status.replace(/\s/g, '');
+  }
 
-    const div = document.createElement('div');
-    div.className = 'order-card';
-    div.innerHTML = `
-      <div class="order-header">
-        <h3>${order.name} - $${order.price} (x${order.quantity || 1})</h3>
-        <span>Status: <b id="status-${index}">Processing</b></span>
-      </div>
-      <div class="progress-container">
-        <div class="progress" id="progress-${index}"></div>
-        <div class="step" style="left:0%">
-          <div class="circle" id="circle-${index}-0">1</div>
-          <div class="label">Processing</div>
-        </div>
-        <div class="step" style="left:50%">
-          <div class="circle" id="circle-${index}-1">2</div>
-          <div class="label">Shipped</div>
-        </div>
-        <div class="step" style="left:100%">
-          <div class="circle" id="circle-${index}-2">3</div>
-          <div class="label">Delivered</div>
-        </div>
-      </div>
-    `;
-    container.appendChild(div);
-    updateUI(index, order.statusStep);
-  });
-}
+  // Render orders list in admin table
+  function renderOrders(orders) {
+    const tbody = document.getElementById('ordersTableBody');
+    const noOrdersMessage = document.getElementById('noOrdersMessage');
+    tbody.innerHTML = '';
 
-function updateUI(orderIndex, step) {
-  const steps = ["Processing", "Shipped", "Delivered"];
-  const progressBar = document.getElementById(`progress-${orderIndex}`);
-  const statusLabel = document.getElementById(`status-${orderIndex}`);
-  statusLabel.textContent = steps[step] || "Processing";
-
-  // Animate circles gradually
-  for (let i = 0; i <= 2; i++) {
-    const circle = document.getElementById(`circle-${orderIndex}-${i}`);
-    if (i <= step) {
-      setTimeout(() => circle.classList.add('active'), i * 300); // staggered effect
+    if (orders.length === 0) {
+      noOrdersMessage.style.display = 'block';
+      document.getElementById('orderDetails').style.display = 'none';
+      return;
     } else {
-      circle.classList.remove('active');
+      noOrdersMessage.style.display = 'none';
+    }
+
+    orders.forEach(order => {
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td>${order.id}</td>
+        <td>${formatDate(order.date)}</td>
+        <td>${order.total}</td>
+        <td>${order.paymentMethod}</td>
+        <td><span class="status ${statusClass(order.status)}">${order.status}</span></td>
+      `;
+      tr.onclick = () => selectOrder(order.id);
+      tbody.appendChild(tr);
+    });
+  }
+
+  // Filter orders by search input
+  function filterOrders() {
+    const searchVal = document.getElementById('searchInput').value.trim().toLowerCase();
+    const filtered = allOrders.filter(order => order.id.toLowerCase().includes(searchVal));
+    renderOrders(filtered);
+
+    // Clear selection if filtered out
+    if (!filtered.some(o => selectedOrder && o.id === selectedOrder.id)) {
+      clearSelection();
     }
   }
 
-  // Smooth progress bar animation
-  const targetWidth = (step / 2) * 100;
-  let currentWidth = parseFloat(progressBar.style.width) || 0;
-  const stepsCount = 20;
-  const stepSize = (targetWidth - currentWidth) / stepsCount;
-  let counter = 0;
+  // Select order in admin table and show details + status update
+  function selectOrder(orderId) {
+    selectedOrder = allOrders.find(o => o.id === orderId);
+    if (!selectedOrder) return;
 
-  const animate = setInterval(() => {
-    currentWidth += stepSize;
-    progressBar.style.width = currentWidth + '%';
-    counter++;
-    if (counter >= stepsCount) clearInterval(animate);
-  }, 20);
-}
+    let itemsHTML = selectedOrder.items.map(i => `
+      <div class="item">${i.title || i.name || 'Product'} — Rs. ${i.price} × ${i.qty || 1}</div>
+    `).join('');
 
-// Update automatically when localStorage changes (e.g., admin updates)
-window.addEventListener('storage', function(event) {
-  if (event.key === 'pastOrders') loadOrders();
-});
+    document.getElementById('orderInfo').innerHTML = `
+      <p><strong>Order ID:</strong> ${selectedOrder.id}</p>
+      <p><strong>Date:</strong> ${formatDate(selectedOrder.date)}</p>
+      <p><strong>Total:</strong> Rs. ${selectedOrder.total}</p>
+      <p><strong>Payment Method:</strong> ${selectedOrder.paymentMethod}</p>
 
-// Initial load
-loadOrders();
+      <h4>Items</h4>
+      <div class="items-list">${itemsHTML}</div>
+    `;
+
+    document.getElementById('statusSelect').value = selectedOrder.status || 'Order Placed';
+    document.getElementById('orderDetails').style.display = 'block';
+
+    // Hide track order section when admin editing
+    document.getElementById('trackOrderDetails').style.display = 'none';
+  }
+
+  // Clear admin selection/details
+  function clearSelection() {
+    selectedOrder = null;
+    document.getElementById('orderDetails').style.display = 'none';
+  }
+
+  // Save status update to localStorage
+  function saveStatus() {
+    if (!selectedOrder) {
+      alert('Please select an order to update!');
+      return;
+    }
+    const newStatus = document.getElementById('statusSelect').value;
+    selectedOrder.status = newStatus;
+
+    const idx = allOrders.findIndex(o => o.id === selectedOrder.id);
+    if (idx !== -1) {
+      allOrders[idx] = selectedOrder;
+      localStorage.setItem('pastOrders', JSON.stringify(allOrders));
+      alert('✅ Status updated!');
+      renderOrders(allOrders);
+      selectOrder(selectedOrder.id);
+    }
+  }
+
+  // Customer Track Order - shows order status/details
+  function trackOrder() {
+    const id = document.getElementById('trackOrderInput').value.trim();
+    const trackDetailsDiv = document.getElementById('trackOrderDetails');
+    const trackInfoDiv = document.getElementById('trackOrderInfo');
+
+    if (!id) {
+      alert('Please enter your order ID to track.');
+      trackDetailsDiv.style.display = 'none';
+      return;
+    }
+
+    const order = allOrders.find(o => o.id.toLowerCase() === id.toLowerCase());
+    if (!order) {
+      trackInfoDiv.innerHTML = `<p style="color:#f44336;">Order ID <strong>${id}</strong> not found.</p>`;
+      trackDetailsDiv.style.display = 'block';
+      return;
+    }
+
+    let itemsHTML = order.items.map(i => `
+      <div class="item">${i.title || i.name || 'Product'} — Rs. ${i.price} × ${i.qty || 1}</div>
+    `).join('');
+
+    trackInfoDiv.innerHTML = `
+      <p><strong>Order ID:</strong> ${order.id}</p>
+      <p><strong>Date:</strong> ${formatDate(order.date)}</p>
+      <p><strong>Total:</strong> Rs. ${order.total}</p>
+      <p><strong>Payment Method:</strong> ${order.paymentMethod}</p>
+      <p><strong>Status:</strong> <span class="status ${statusClass(order.status)}">${order.status}</span></p>
+
+      <h4>Items</h4>
+      <div class="items-list">${itemsHTML}</div>
+    `;
+
+    trackDetailsDiv.style.display = 'block';
+
+    // Hide admin edit details when tracking
+    document.getElementById('orderDetails').style.display = 'none';
+  }
+
+  // Initial render of all orders for admin
+  renderOrders(allOrders);
 </script>
 
 </body>

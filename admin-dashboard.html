@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Xander Admin Dashboard + Track Order</title>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    background: #121212;
+    color: #fff;
+    padding: 20px;
+    min-height: 100vh;
+  }
+  header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+  }
+  h1 {
+    color: #ff4081;
+    margin: 0;
+  }
+  button.logout-btn {
+    background: #ff4081;
+    border: none;
+    padding: 10px 18px;
+    border-radius: 8px;
+    color: #fff;
+    cursor: pointer;
+    font-weight: 700;
+    font-size: 14px;
+    transition: background 0.3s;
+  }
+  button.logout-btn:hover {
+    background: #ff1f6b;
+  }
+
+  .section {
+    margin-bottom: 30px;
+  }
+
+  input[type="text"] {
+    padding: 10px;
+    border-radius: 8px;
+    border: none;
+    font-size: 16px;
+    background: #292929;
+    color: #fff;
+    width: 300px;
+    max-width: 100%;
+  }
+
+  button.btn-primary {
+    background: #ff4081;
+    border: none;
+    padding: 10px 18px;
+    border-radius: 8px;
+    color: #fff;
+    cursor: pointer;
+    font-weight: 700;
+    font-size: 16px;
+    margin-left: 10px;
+  }
+  button.btn-primary:hover {
+    background: #ff1f6b;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    background: #1f1f1f;
+    border-radius: 12px;
+    overflow: hidden;
+    margin-top: 20px;
+  }
+  thead {
+    background: #2a2a2a;
+  }
+  th, td {
+    padding: 14px 10px;
+    text-align: left;
+    border-bottom: 1px solid #333;
+  }
+  tr:hover {
+    background: #333;
+    cursor: pointer;
+  }
+  .status {
+    padding: 6px 12px;
+    border-radius: 9999px;
+    font-weight: 700;
+    display: inline-block;
+    font-size: 0.9rem;
+  }
+  .status.OrderPlaced { background: #ff9800; color: #111; }
+  .status.Packed { background: #2196f3; color: #fff; }
+  .status.Shipped { background: #3f51b5; color: #fff; }
+  .status.InTransit { background: #9c27b0; color: #fff; }
+  .status.Delivered { background: #4caf50; color: #111; }
+  .status.Cancelled { background: #f44336; color: #fff; }
+
+  #orderDetails, #trackOrderDetails {
+    background: #1f1f1f;
+    border-radius: 12px;
+    padding: 20px;
+    margin-top: 20px;
+  }
+  #orderDetails h2, #trackOrderDetails h2 {
+    color: #ff4081;
+    margin-top: 0;
+  }
+  #orderDetails p, #trackOrderDetails p {
+    margin: 10px 0;
+  }
+  .items-list {
+    margin-top: 12px;
+  }
+  .item {
+    border-bottom: 1px solid #333;
+    padding: 6px 0;
+  }
+  select {
+    margin-top: 12px;
+    padding: 10px;
+    border-radius: 8px;
+    border: none;
+    font-size: 16px;
+    background: #292929;
+    color: #fff;
+    width: 100%;
+  }
+  button.save-btn {
+    margin-top: 16px;
+    padding: 14px;
+    width: 100%;
+    border-radius: 8px;
+    border: none;
+    background: #ff4081;
+    color: #fff;
+    font-weight: 700;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background 0.3s;
+  }
+  button.save-btn:hover {
+    background: #ff1f6b;
+  }
+  .no-orders {
+    text-align: center;
+    padding: 40px;
+    color: #777;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Xander Admin Dashboard + Track Order</h1>
+  <button class="logout-btn" onclick="logout()">Logout</button>
+</header>
+
+<!-- Track Order Section -->
+<section class="section">
+  <h2>Track Order (Customer or Admin)</h2>
+  <input type="text" id="trackOrderInput" placeholder="Enter Order ID to Track" />
+  <button class="btn-primary" onclick="trackOrder()">Track Order</button>
+
+  <div id="trackOrderDetails" style="display:none; margin-top:20px;">
+    <h3>Order Tracking Result</h3>
+    <div id="trackOrderInfo"></div>
+  </div>
+</section>
+
+<!-- Admin Orders List and Details -->
+<section class="section">
+  <h2>All Orders (Admin Dashboard)</h2>
+  <input type="text" id="searchInput" placeholder="Search orders by Order ID" oninput="filterOrders()" style="width: 100%; max-width: 400px; margin-bottom: 10px;" />
+
+  <table>
+    <thead>
+      <tr>
+        <th>Order ID</th>
+        <th>Date</th>
+        <th>Total (Rs.)</th>
+        <th>Payment</th>
+        <th>Status</th>
+      </tr>
+    </thead>
+    <tbody id="ordersTableBody"></tbody>
+  </table>
+
+  <div id="noOrdersMessage" class="no-orders" style="display:none;">No orders found.</div>
+
+  <div id="orderDetails" style="display:none;">
+    <h3>Order Details & Status Update</h3>
+    <div id="orderInfo"></div>
+    <label for="statusSelect" style="display:block;margin-top:10px;">Update Status:</label>
+    <select id="statusSelect" aria-label="Update order status">
+      <option>Order Placed</option>
+      <option>Packed</option>
+      <option>Shipped</option>
+      <option>In Transit</option>
+      <option>Delivered</option>
+      <option>Cancelled</option>
+    </select>
+    <button class="save-btn" onclick="saveStatus()">Save Status</button>
+  </div>
+</section>
+
+<script>
+  // Check admin logged in - simple example
+  if (localStorage.getItem('xanderAdminLoggedIn') !== 'true') {
+    window.location.href = 'admin-login.html';
+  }
+
+  const ordersTableBody = document.getElementById('ordersTableBody');
+  const noOrdersMessage = document.getElementById('noOrdersMessage');
+  const orderDetails = document.getElementById('orderDetails');
+  const orderInfoDiv = document.getElementById('orderInfo');
+  const statusSelect = document.getElementById('statusSelect');
+
+  const trackOrderDetails = document.getElementById('trackOrderDetails');
+  const trackOrderInfo = document.getElementById('trackOrderInfo');
+  const trackOrderInput = document.getElementById('trackOrderInput');
+
+  let allOrders = [];
+  let selectedOrder = null;
+
+  function formatDate(dateStr) {
+    return new Date(dateStr).toLocaleString();
+  }
+
+  function statusClass(status) {
+    return status.replace(/\s/g, '');
+  }
+
+  // Load all orders from localStorage and render
+  function loadOrders() {
+    allOrders = JSON.parse(localStorage.getItem('pastOrders') || '[]');
+    renderOrders(allOrders);
+  }
+
+  // Render orders table rows
+  function renderOrders(orders) {
+    ordersTableBody.innerHTML = '';
+    if (orders.length === 0) {
+      noOrdersMessage.style.display = 'block';
+      orderDetails.style.display = 'none';
+      return;
+    } else {
+      noOrdersMessage.style.display = 'none';
+    }
+
+    orders.forEach(order => {
+      const row = document.createElement('tr');
+      row.innerHTML = `
+        <td>${order.id}</td>
+        <td>${formatDate(order.date)}</td>
+        <td>${order.total}</td>
+        <td>${order.paymentMethod}</td>
+        <td><span class="status ${statusClass(order.status)}">${order.status}</span></td>
+      `;
+      row.addEventListener('click', () => selectOrder(order.id));
+      ordersTableBody.appendChild(row);
+    });
+  }
+
+  // Filter orders by Order ID
+  function filterOrders() {
+    const searchVal = document.getElementById('searchInput').value.trim().toLowerCase();
+    const filtered = allOrders.filter(o => o.id.toLowerCase().includes(searchVal));
+    renderOrders(filtered);
+    if (!filtered.some(o => selectedOrder && o.id === selectedOrder.id)) {
+      clearSelection();
+    }
+  }
+
+  // Select order for admin to view + edit status
+  function selectOrder(orderId) {
+    selectedOrder = allOrders.find(o => o.id === orderId);
+    if (!selectedOrder) return;
+
+    let itemsHTML = selectedOrder.items.map(i => `
+      <div class="item">${i.title || i.name || 'Product'} — Rs. ${i.price} × ${i.qty || 1}</div>
+    `).join('');
+
+    orderInfoDiv.innerHTML = `
+      <p><strong>Order ID:</strong> ${selectedOrder.id}</p>
+      <p><strong>Date:</strong> ${formatDate(selectedOrder.date)}</p>
+      <p><strong>Total:</strong> Rs. ${selectedOrder.total}</p>
+      <p><strong>Payment Method:</strong> ${selectedOrder.paymentMethod}</p>
+
+      <h4>Items</h4>
+      <div class="items-list">${itemsHTML}</div>
+    `;
+
+    statusSelect.value = selectedOrder.status || 'Order Placed';
+    orderDetails.style.display = 'block';
+
+    // Hide track order result if visible
+    trackOrderDetails.style.display = 'none';
+  }
+
+  // Clear selection
+  function clearSelection() {
+    selectedOrder = null;
+    orderDetails.style.display = 'none';
+  }
+
+  // Save status change to localStorage
+  function saveStatus() {
+    if (!selectedOrder) {
+      alert('Select an order first!');
+      return;
+    }
+    const newStatus = statusSelect.value;
+    selectedOrder.status = newStatus;
+
+    const idx = allOrders.findIndex(o => o.id === selectedOrder.id);
+    if (idx !== -1) {
+      allOrders[idx] = selectedOrder;
+      localStorage.setItem('pastOrders', JSON.stringify(allOrders));
+      alert('✅ Status updated!');
+      renderOrders(allOrders);
+      selectOrder(selectedOrder.id);
+    }
+  }
+
+  // Track order function (customer or admin)
+  function trackOrder() {
+    const id = trackOrderInput.value.trim();
+    if (!id) {
+      alert('Please enter an order ID.');
+      trackOrderDetails.style.display = 'none';
+      return;
+    }
+
+    const order = allOrders.find(o => o.id.toLowerCase() === id.toLowerCase());
+    if (!order) {
+      trackOrderInfo.innerHTML = `<p style="color:#f44336;">Order ID <strong>${id}</strong> not found.</p>`;
+      trackOrderDetails.style.display = 'block';
+      return;
+    }
+
+    let itemsHTML = order.items.map(i => `
+      <div class="item">${i.title || i.name || 'Product'} — Rs. ${i.price} × ${i.qty || 1}</div>
+    `).join('');
+
+    trackOrderInfo.innerHTML = `
+      <p><strong>Order ID:</strong> ${order.id}</p>
+      <p><strong>Date:</strong> ${formatDate(order.date)}</p>
+      <p><strong>Total:</strong> Rs. ${order.total}</p>
+      <p><strong>Payment Method:</strong> ${order.paymentMethod}</p>
+      <p><strong>Status:</strong> <span class="status ${statusClass(order.status)}">${order.status}</span></p>
+
+      <h4>Items</h4>
+      <div class="items-list">${itemsHTML}</div>
+    `;
+
+    trackOrderDetails.style.display = 'block';
+
+    // Hide admin order details when tracking
+    orderDetails.style.display = 'none';
+  }
+
+  function logout() {
+    localStorage.removeItem('xanderAdminLoggedIn');
+    window.location.href = 'admin-login.html';
+  }
+
+  loadOrders();
+</script>
+
+</body>
+</html>

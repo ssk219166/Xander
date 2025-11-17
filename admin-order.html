@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Xander Admin Order Details</title>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    background: #121212;
+    color: #fff;
+    padding: 20px;
+    max-width: 720px;
+    margin: auto;
+  }
+  h1, h2 {
+    color: #ff4081;
+  }
+  .btn-back {
+    background: transparent;
+    border: none;
+    color: #ff4081;
+    font-weight: 700;
+    cursor: pointer;
+    margin-bottom: 20px;
+    font-size: 16px;
+  }
+  .order-info {
+    background: #1f1f1f;
+    padding: 20px;
+    border-radius: 12px;
+  }
+  .order-info p {
+    margin: 10px 0;
+  }
+  .items-list {
+    margin-top: 16px;
+  }
+  .item {
+    border-bottom: 1px solid #333;
+    padding: 8px 0;
+  }
+  select {
+    margin-top: 12px;
+    padding: 10px;
+    border-radius: 8px;
+    border: none;
+    font-size: 16px;
+    background: #292929;
+    color: #fff;
+    width: 100%;
+  }
+  button.save-btn {
+    margin-top: 18px;
+    padding: 14px;
+    width: 100%;
+    border-radius: 8px;
+    border: none;
+    background: #ff4081;
+    color: #fff;
+    font-weight: 700;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background 0.3s;
+  }
+  button.save-btn:hover {
+    background: #ff1f6b;
+  }
+</style>
+</head>
+<body>
+
+<button class="btn-back" onclick="goBack()">← Back to Dashboard</button>
+
+<h1>Order Details</h1>
+
+<div class="order-info" id="orderInfo">
+  <!-- Loaded dynamically -->
+</div>
+
+<script>
+  // Redirect if not logged in
+  if (localStorage.getItem('xanderAdminLoggedIn') !== 'true') {
+    window.location.href = 'admin-login.html';
+  }
+
+  const urlParams = new URLSearchParams(window.location.search);
+  const orderId = urlParams.get('id');
+  const orderInfoDiv = document.getElementById('orderInfo');
+
+  if (!orderId) {
+    orderInfoDiv.innerHTML = '<p style="color:#f55;">No Order ID provided.</p>';
+  }
+
+  // Load order data
+  let orders = JSON.parse(localStorage.getItem('pastOrders') || '[]');
+  let order = orders.find(o => o.id === orderId);
+
+  if (!order) {
+    orderInfoDiv.innerHTML = '<p style="color:#f55;">Order not found.</p>';
+  } else {
+    renderOrder(order);
+  }
+
+  function renderOrder(o) {
+    const dateStr = new Date(o.date).toLocaleString();
+    const itemsHTML = o.items.map(i => `
+      <div class="item">${i.title || i.name || 'Product'} — Rs. ${i.price} × ${i.qty || 1}</div>
+    `).join('');
+
+    orderInfoDiv.innerHTML = `
+      <p><strong>Order ID:</strong> ${o.id}</p>
+      <p><strong>Date:</strong> ${dateStr}</p>
+      <p><strong>Total:</strong> Rs. ${o.total}</p>
+      <p><strong>Payment Method:</strong> ${o.paymentMethod}</p>
+
+      <h2>Items</h2>
+      <div class="items-list">${itemsHTML}</div>
+
+      <h2>Update Status</h2>
+      <select id="statusSelect">
+        <option ${o.status === "Order Placed" ? "selected" : ""}>Order Placed</option>
+        <option ${o.status === "Packed" ? "selected" : ""}>Packed</option>
+        <option ${o.status === "Shipped" ? "selected" : ""}>Shipped</option>
+        <option ${o.status === "In Transit" ? "selected" : ""}>In Transit</option>
+        <option ${o.status === "Delivered" ? "selected" : ""}>Delivered</option>
+        <option ${o.status === "Cancelled" ? "selected" : ""}>Cancelled</option>
+      </select>
+
+      <button class="save-btn" onclick="saveStatus()">Save Status</button>
+    `;
+  }
+
+  function saveStatus() {
+    const newStatus = document.getElementById('statusSelect').value;
+    order.status = newStatus;
+    localStorage.setItem('pastOrders', JSON.stringify(orders));
+    alert('✅ Status updated!');
+  }
+
+  function goBack() {
+    window.location.href = 'admin-dashboard.html';
+  }
+</script>
+
+</body>
+</html>

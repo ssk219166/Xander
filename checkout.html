@@ -1,165 +1,174 @@
+Below are four ready-to-use HTML files for your Xander store. Copy each block into its own file (filename shown) and open in a browser. These use `localStorage` for cart/pastOrders and include a simulated EZY Cash flow.
+
+---
+
+## File: `checkout.html`
+
+```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Xander | Checkout</title>
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
 <style>
-* { margin:0; padding:0; box-sizing:border-box; font-family:'Poppins', sans-serif; }
+*{box-sizing:border-box;margin:0;padding:0;font-family:'Poppins',sans-serif}
+body{background:linear-gradient(135deg,#0f172a,#0b1220);color:#fff;min-height:100vh;padding:28px}
+.container{max-width:920px;margin:0 auto;background:rgba(255,255,255,0.03);padding:22px;border-radius:14px}
+.header{display:flex;justify-content:space-between;align-items:center;margin-bottom:18px}
+.header h1{font-size:1.4rem}
+.card{background:rgba(255,255,255,0.04);padding:16px;border-radius:12px;margin-bottom:12px}
+.item{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid rgba(255,255,255,0.03)}
+.item:last-child{border-bottom:none}
+.summary{display:flex;justify-content:space-between;align-items:center;margin-top:12px}
+.pay-options{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
+.option{background:#fff;color:#111;padding:14px;border-radius:10px;cursor:pointer;display:flex;justify-content:space-between;align-items:center}
+.option.selected{border:3px solid #ff2b78}
+.btn{display:inline-block;padding:12px 18px;border-radius:999px;background:#ff2b78;color:#fff;font-weight:700;border:none;cursor:pointer}
+.btn.secondary{background:transparent;border:1px solid rgba(255,255,255,0.12)}
+.center{text-align:center}
+.ezy-qr{display:flex;gap:14px;align-items:center}
+.ezy-qr img{width:120px;height:120px;background:#fff;border-radius:8px}
+.small{font-size:0.85rem;opacity:0.9}
+.notice{margin-top:12px;background:rgba(255,255,255,0.02);padding:10px;border-radius:8px}
 
-body {
-  color: #fff;
-  background: linear-gradient(270deg, #ff758c, #ff7eb3, #9face6);
-  background-size: 600% 600%;
-  animation: gradientBG 15s ease infinite;
-}
-
-@keyframes gradientBG {
-  0% { background-position:0% 50%; }
-  50% { background-position:100% 50%; }
-  100% { background-position:0% 50%; }
-}
-
-header {
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  padding:15px 40px;
-  background: rgba(0,0,0,0.4);
-  backdrop-filter: blur(10px);
-  position: sticky;
-  top:0;
-  z-index:1000;
-}
-
-header h1 { font-size:1.8rem; font-weight:700; }
-nav a { margin:0 15px; text-decoration:none; color:#fff; font-weight:500; }
-.profile-btn {
-  background:#fff;
-  color:#333;
-  border-radius:10px;
-  width:40px;
-  height:40px;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  font-weight:bold;
-  cursor:pointer;
-  box-shadow:0 4px 8px rgba(0,0,0,0.2);
-}
-
-main { padding:50px 20px; max-width:900px; margin:0 auto; }
-
-h2 { margin-bottom:20px; font-size:2rem; }
-.cart-item { display:flex; justify-content:space-between; align-items:center; background:rgba(255,255,255,0.2); padding:15px; border-radius:10px; margin-bottom:10px; }
-.cart-item button { padding:5px 10px; border:none; border-radius:5px; cursor:pointer; }
-.cart-item button.update { background:orange; color:white; margin-right:5px; }
-.cart-item button.remove { background:red; color:white; }
-
-#total { font-weight:bold; font-size:1.2rem; margin-top:20px; }
-
-button#checkoutBtn { margin-top:30px; padding:12px 25px; font-size:1rem; font-weight:600; background:#fff; color:#333; border:none; border-radius:25px; cursor:pointer; transition:0.3s; }
-button#checkoutBtn:hover { background:#ffdfdf; transform:scale(1.05); }
-
+@media(max-width:600px){.pay-options{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
-
-<header>
-  <h1>Xander</h1>
-  <nav>
-    <a href="index.html">Home</a>
-    <a href="shopping.html">Shop</a>
-    <a href="cart.html">Cart</a>
-    <a href="yourprofile.html">Profile</a>
-  </nav>
-  <div style="display:flex;align-items:center;gap:10px;">
-    <span id="cartCount">🛒 0</span>
-    <div class="profile-btn" onclick="window.location.href='profile.html'">U</div>
+<div class="container">
+  <div class="header">
+    <h1>Xander — Checkout</h1>
+    <div id="cart-count">🛒 0</div>
   </div>
-</header>
 
-<main>
-  <h2>Checkout</h2>
-  <div id="checkoutContainer"></div>
-  <div id="total">Total: $0</div>
-  <button id="checkoutBtn">Proceed to Payment</button>
-</main>
+  <div class="card">
+    <h3>Your Cart</h3>
+    <div id="cart-items" style="margin-top:10px"></div>
+    <div class="summary">
+      <div class="small">Total</div>
+      <div id="cart-total" style="font-weight:800">0.00</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Select Payment Method</h3>
+    <div class="pay-options">
+      <div class="option" onclick="select('PayPal', this)">PayPal <span>🅿️</span></div>
+      <div class="option" onclick="select('Stripe', this)">Card (Stripe) <span>💳</span></div>
+      <div class="option" onclick="select('Apple/Google', this)">Apple/Google Pay <span>📱</span></div>
+      <div class="option" onclick="select('EzyCash', this)">EZY Cash (Sri Lanka) <span>📲</span></div>
+      <div class="option" onclick="select('Bank', this)">Bank Transfer <span>🏦</span></div>
+      <div class="option" onclick="select('COD', this)">Cash on Delivery <span>💵</span></div>
+    </div>
+
+    <div id="ezy-section" style="display:none;margin-top:14px">
+      <div class="notice small">EZY Cash simulated flow — merchant QR + mobile approval.</div>
+      <div style="display:flex;gap:12px;align-items:center;margin-top:12px">
+        <div class="ezy-qr">
+          <img src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='400' height='400'><rect width='100%' height='100%' fill='%23ffffff'/><text x='50%' y='50%' dominant-baseline='middle' text-anchor='middle' fill='%23000000' font-size='28'>EZYCASH QR</text></svg>" alt="QR">
+          <div class="small">Scan this QR with EZY Cash app or enter mobile number.</div>
+        </div>
+      </div>
+
+      <div style="margin-top:12px;display:flex;gap:10px;flex-wrap:wrap;align-items:center">
+        <input id="ezy-mobile" placeholder="07xxxxxxxx" style="padding:10px;border-radius:8px;border:0;min-width:160px">
+        <button class="btn" onclick="simulateEzyPay()">Simulate EZY Pay</button>
+      </div>
+    </div>
+
+    <div style="margin-top:16px;display:flex;gap:10px">
+      <button class="btn" onclick="placeOrder()" a href="order-success.html">Pay Now</button>
+      <button class="btn secondary" onclick="window.location.href='cart.html'">Back to Cart</button>
+    </div>
+  </div>
+
+  <div style="margin-top:16px;text-align:center" class="small">
+    <a href="trackorder.html" style="color:#fff;text-decoration:underline">Track my orders</a>
+  </div>
+</div>
 
 <script>
-// Load profile initial
-function loadProfileInitial() {
-  const name = localStorage.getItem('username') || 'U';
-  document.querySelector('.profile-btn').textContent = name.charAt(0).toUpperCase();
-}
+// Utilities
+function formatCurrency(n){return (Number(n)||0).toFixed(2)}
 
-// Update cart count
-function updateCartCount() {
-  const cart = JSON.parse(localStorage.getItem('cart') || '[]');
-  document.getElementById('cartCount').textContent = `🛒 ${cart.length}`;
-}
-
-// Render checkout items
-function renderCheckout() {
-  const container = document.getElementById('checkoutContainer');
-  const cart = JSON.parse(localStorage.getItem('cart') || '[]');
-  container.innerHTML = "";
-  if(cart.length === 0){
-    container.innerHTML = "<p>Your cart is empty.</p>";
-    document.getElementById('total').textContent = "Total: $0";
-    return;
-  }
-  let total = 0;
-  cart.forEach((item,index)=>{
-    total += item.price * (item.quantity || 1);
-    container.innerHTML += `
-      <div class="cart-item">
-        <span>${item.name} (x${item.quantity || 1}) - $${item.price}</span>
-        <div>
-          <button class="update" onclick="updateCart(${index})">Update</button>
-          <button class="remove" onclick="removeCart(${index})">Remove</button>
-        </div>
-      </div>`;
+// Load cart
+function loadCart(){
+  const cart = JSON.parse(localStorage.getItem('cart')||'[]');
+  const container = document.getElementById('cart-items');
+  container.innerHTML='';
+  let total=0;
+  if(cart.length===0){ container.innerHTML='<div class="small center">Your cart is empty.</div>'; }
+  cart.forEach((it, idx)=>{
+    const price = Number(it.price||0);
+    total += price*(it.qty||1);
+    const div = document.createElement('div'); div.className='item';
+    div.innerHTML = `<div>${it.title||'Product'} <div class='small'>x ${it.qty||1}</div></div><div>${formatCurrency(price*(it.qty||1))}</div>`;
+    container.appendChild(div);
   });
-  document.getElementById('total').textContent = `Total: $${total}`;
+  document.getElementById('cart-total').textContent = formatCurrency(total);
+  document.getElementById('cart-count').textContent = `🛒 ${cart.length}`;
+}
+loadCart();
+
+// Payment selection
+let paymentMethod = null;
+function select(method, el){
+  paymentMethod = method;
+  document.querySelectorAll('.option').forEach(o=>o.classList.remove('selected'));
+  el.classList.add('selected');
+  document.getElementById('ezy-section').style.display = (method==='EzyCash')? 'block':'none';
 }
 
-// Cart item functions
-function removeCart(index){
-  let cart = JSON.parse(localStorage.getItem('cart') || '[]');
-  cart.splice(index,1);
-  localStorage.setItem('cart',JSON.stringify(cart));
-  updateCartCount();
-  renderCheckout();
-}
-
-function updateCart(index){
-  let cart = JSON.parse(localStorage.getItem('cart') || '[]');
-  const newQty = parseInt(prompt("Enter new quantity:", cart[index].quantity || 1));
-  if(newQty > 0){
-    cart[index].quantity = newQty;
-    localStorage.setItem('cart',JSON.stringify(cart));
-    renderCheckout();
-    updateCartCount();
-  }
-}
-
-// Proceed to payment
-document.getElementById('checkoutBtn').addEventListener('click',()=>{
-  const cart = JSON.parse(localStorage.getItem('cart') || '[]');
-  if(cart.length === 0){
-    alert("Cart is empty!");
+// Simulate EZY Pay (for demo)
+function simulateEzyPay(){
+  const mob = document.getElementById('ezy-mobile').value.trim();
+  if(!/^0[7|6|9]\d{8}$/.test(mob)){
+    alert('Enter a valid Sri Lankan mobile number (eg: 0712345678)');
     return;
   }
-  window.location.href = "gateway.html";
-});
+  alert('Simulating EZY Cash approval for ' + mob + '. When you click OK the payment will be marked as paid.');
+  paymentMethod = 'EzyCash';
+  placeOrder(true);
+}
 
-// Initialize
-loadProfileInitial();
-updateCartCount();
-renderCheckout();
+// Place order
+function placeOrder(isEzySuccess){
+  if(!paymentMethod){ alert('Please select a payment method.'); return; }
+  const cart = JSON.parse(localStorage.getItem('cart')||'[]');
+  if(cart.length===0){ alert('Cart empty'); return; }
+
+  // If EzyCash and not simulated approved yet, prompt
+  if(paymentMethod==='EzyCash' && !isEzySuccess){
+    alert('For EZY Cash please scan the QR or use "Simulate EZY Pay" button.');
+    return;
+  }
+
+  const orderId = 'XANDER-' + Date.now();
+  const order = {
+    id: orderId,
+    date: new Date().toISOString(),
+    items: cart,
+    total: document.getElementById('cart-total').textContent,
+    paymentMethod: paymentMethod,
+    status: 'Processing'
+  };
+
+  let past = JSON.parse(localStorage.getItem('pastOrders')||'[]');
+  past.unshift(order);
+  localStorage.setItem('pastOrders', JSON.stringify(past));
+
+  // Clear cart
+  localStorage.setItem('cart', JSON.stringify([]));
+
+  // Redirect to success page with order id in hash
+  window.location.href = 'order-success.html#' + orderId;
+}
 </script>
-
 </body>
 </html>
+
+
+
+

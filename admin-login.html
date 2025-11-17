@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Xander Admin Login</title>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    background: #121212;
+    color: #fff;
+    display: flex;
+    height: 100vh;
+    justify-content: center;
+    align-items: center;
+  }
+  .login-box {
+    background: #1f1f1f;
+    padding: 30px;
+    border-radius: 12px;
+    width: 320px;
+    box-shadow: 0 0 20px #ff4081;
+  }
+  h1 {
+    text-align: center;
+    color: #ff4081;
+    margin-bottom: 24px;
+  }
+  input {
+    width: 100%;
+    padding: 14px;
+    margin: 10px 0;
+    border-radius: 8px;
+    border: none;
+    background: #292929;
+    color: #fff;
+    font-size: 16px;
+  }
+  button {
+    width: 100%;
+    padding: 14px;
+    border-radius: 8px;
+    border: none;
+    background: #ff4081;
+    color: white;
+    font-weight: 700;
+    cursor: pointer;
+    margin-top: 10px;
+    font-size: 16px;
+    transition: background 0.3s;
+  }
+  button:hover {
+    background: #ff1f6b;
+  }
+  .error {
+    color: #ff5555;
+    margin-top: 8px;
+    text-align: center;
+  }
+</style>
+</head>
+<body>
+
+<div class="login-box">
+  <h1>Xander Admin</h1>
+  <input type="text" id="username" placeholder="Username" autocomplete="off" />
+  <input type="password" id="password" placeholder="Password" autocomplete="off" />
+  <button onclick="login()">Login</button>
+  <div id="error" class="error"></div>
+</div>
+
+<script>
+  // Simple client-side login (DO NOT use for production!)
+  // You can change credentials here:
+  const ADMIN_USERNAME = 'admin';
+  const ADMIN_PASSWORD = 'xander123';
+
+  function login() {
+    const u = document.getElementById('username').value.trim();
+    const p = document.getElementById('password').value.trim();
+    const errorDiv = document.getElementById('error');
+
+    if (u === ADMIN_USERNAME && p === ADMIN_PASSWORD) {
+      localStorage.setItem('xanderAdminLoggedIn', 'true');
+      window.location.href = 'admin-dashboard.html';
+    } else {
+      errorDiv.textContent = 'Invalid username or password.';
+    }
+  }
+
+  // Redirect if already logged in
+  if (localStorage.getItem('xanderAdminLoggedIn') === 'true') {
+    window.location.href = 'admin-dashboard.html';
+  }
+</script>
+
+</body>
+</html>
